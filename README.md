@@ -18,19 +18,72 @@ Simple single GET flow performing 100 requests with 10 concurrent connections
 
 ```javascript
   var flow = {
-    main: [{ get: 'http://localhost:8000/' }]
+    main: [{ get: 'http://localhost:8000/' }]  // could be an array of REST operations
   };
   var runOptions = {
     limit: 10,     // concurrent connections
     requests: 100  // number of requests to perform
   };
-  var errors = [];
   benchrest(flow, runOptions)
     .on('error', function (err) { console.error(err); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
     });
+```
+
+See `Detailed Usage` section below for more details
+
+## Goals
+
+ - Easy to create REST (HTTP/HTTPS) flows for benchmarking
+ - Generate good concurrency (at least 8K concurrent connections for single proc on Mac OS X)
+ - Obtain metrics from the runs with average, total, min, max, histogram, req/s
+ - Allow iterations to vary easily using token subsitution
+ - Run programmatically so can be used with CI server
+ - Flow can have setup and teardown operations for startup and shutdown as well as for each iteration
+ - Ability to automatically handles cookies separately for each iteration
+ - Abilty to automatically follows redirects for operations
+ - Errors will automatically stop an iterations flow and be tracked
+ - Easy use and handling of etags
+ - Allows pre/post processing or verification of data
+
+
+## Detailed Usage
+
+The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
+
+The `stats.main` will be the meter data for the main benchmark flow operations (not including the beforeMain and afterMain operations).
+
+`stats.totalElapsed` is the elapsed time in milliseconds for the entire run including all setup and teardown operations
+
+The output of the above run will look something like:
+
+```javascript
+error count:  0
+stats {
+  totalElapsed: 151,
+  main:
+   { meter:
+      { mean: 1190.4761904761904,
+        count: 100,
+        currentRate: 1190.4761904761904,
+        '1MinuteRate': 0,
+        '5MinuteRate': 0,
+        '15MinuteRate': 0 },
+     histogram:
+      { min: 3,
+        max: 66,
+        sum: 985,
+        variance: 43.502525252525245,
+        mean: 9.85,
+        stddev: 6.595644415258091,
+        count: 100,
+        median: 8.5,
+        p75: 11,
+        p95: 17,
+        p99: 65.53999999999976,
+        p999: 66 } } }
 ```
 
 Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
@@ -153,21 +206,7 @@ The properties available on the `all` object are:
  - all.cb - the cb that will be called when done
 
 
-## Goals
-
- - Easy to create REST (HTTP/HTTPS) flows for benchmarking
- - Generate good concurrency (at least 8K concurrent connections for single proc on Mac OS X)
- - Obtain metrics from the runs with average, total, min, max, histogram, req/s
- - Allow iterations to vary easily using token subsitution
- - Run programmatically so can be used with CI server
- - Flow can have setup and teardown operations for startup and shutdown as well as for each iteration
- - Ability to automatically handles cookies separately for each iteration
- - Abilty to automatically follows redirects for operations
- - Errors will automatically stop an iterations flow and be tracked
- - Easy use and handling of etags
- - Allows pre/post processing or verification of data
-
-## Why
+## Why create this project?
 
 It is important to understand how well your architecture performs and with each change to the system how performance is impacted. The best way to know this is to benchmark your system with each major change.
 
@@ -202,6 +241,10 @@ ulimit -S -n 20000  # set soft max open files
  - request - https://github.com/mikeal/request - for http/https operations with cookies, redirects
  - async - https://github.com/caolan/async - for limiting concurrency
  - measured - https://github.com/felixge/node-measured - for metrics
+
+## TODO
+
+ - command line runner
 
 ## Get involved
 
