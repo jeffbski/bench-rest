@@ -6,23 +6,23 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
 
 ## Contents on this page
 
- - <a href="installation">Installation</a>
- - <a href="prog-usage">Programmatic usage</a>
- - <a href="cmd-usage">Command-line usage</a>
- - <a href="goals">Goals</a>
- - <a href="detailed-usage">Detailed usage</a>
-   - <a href="returns">Returns EventEmitter</a>
-   - <a href="stats">Stats (metrics) and errorCount benchmark results</a>
-   - <a href="run-options">Run options - number of iterations and concurrency</a>
-   - <a href="rest-flow">REST operations flow</a>
-   - <a href="tokens">Token substitution</a>
-   - <a href="pre-post">Pre/post operation processing</a>
- - <a href="why">Why create this project?</a>
- - <a href="tuning">Tuning</a>
-   - <a href="tuning-mac">Tuning Mac OS</a>
- - <a href="dependencies">Dependencies</a>
- - <a href="get-involved">Get Involved</a>
- - <a href="license">MIT License</a>
+ - <a href="#installation">Installation</a>
+ - <a href="#prog-usage">Programmatic usage</a>
+ - <a href="#cmd-usage">Command-line usage</a>
+ - <a href="#goals">Goals</a>
+ - <a href="#detailed-usage">Detailed usage</a>
+   - <a href="#returns">Returns EventEmitter</a>
+   - <a href="#stats">Stats (metrics) and errorCount benchmark results</a>
+   - <a href="#run-options">Run options - number of iterations and concurrency</a>
+   - <a href="#rest-flow">REST operations flow</a>
+   - <a href="#tokens">Token substitution</a>
+   - <a href="#pre-post">Pre/post operation processing</a>
+ - <a href="#why">Why create this project?</a>
+ - <a href="#tuning">Tuning</a>
+   - <a href="#tuning-mac">Tuning Mac OS</a>
+ - <a href="#dependencies">Dependencies</a>
+ - <a href="#get-involved">Get Involved</a>
+ - <a href="#license">MIT License</a>
 
 
 <a name="installation"/>
