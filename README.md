@@ -220,6 +220,10 @@ Benchmarking also lets you:
  - whether a feature added improved or hurt performance
  - predict the need add instances or throttle load before your server reaches overload
 
+After attempting to use the variety of load testing clients and modules for benchmarking, none really met all of my desired goals. Most clients are only able to benchmark a single operation, not a whole flow and not one with setup and teardown.
+
+Building your own is certainly an option but it gets tedious to make all the necessary setup and error handling to achieve a simple flow and thus this project was born.
+
 ## Tuning
 
 Each OS may need some tweaking of the configuration to be able to generate or receive a large number of concurrent connections.
