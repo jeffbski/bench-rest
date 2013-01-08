@@ -9,7 +9,7 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
 Requires node.js >= 0.8
 
 ```bash
-npm install ## install dependent node modules
+npm install bench-rest
 ```
 
 ## Usage
