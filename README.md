@@ -17,6 +17,7 @@ npm install bench-rest
 Simple single GET flow performing 100 requests with 10 concurrent connections
 
 ```javascript
+  var benchrest = require('bench-rest');
   var flow = {
     main: [{ get: 'http://localhost:8000/' }]  // could be an array of REST operations
   };
@@ -54,6 +55,7 @@ See `Detailed Usage` section below for more details
 Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
 
 ```javascript
+  var benchrest = require('bench-rest');
   var flow = {
     before: [],      // operations to do before anything
     beforeMain: [],  // operations to do before each iteration
