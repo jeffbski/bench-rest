@@ -1,7 +1,7 @@
 {
   "name": "bench-rest",
   "description": "bench-rest - benchmark REST (HTTP/HTTPS) API's. Node.js client module for easy load testing / benchmarking REST API' using a simple structure/DSL can create REST flows with setup and teardown and returns (measured) metrics.",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "author": "Jeff Barczewski <jeff.barczewski@gmail.com>",
   "repository": { "type": "git", "url": "http://github.com/jeffbski/bench-rest.git" },
   "bugs" : { "url": "http://github.com/jeffbski/bench-rest/issues" },
@@ -11,7 +11,8 @@
   "dependencies": {
     "async": "~0.1.22",
     "request": "~2.12.0",
-    "measured": "~0.1.3"
+    "measured": "~0.1.3",
+    "commander": "~1.1.1"
   },
   "devDependencies": {
     "accum": "~0.1.1",

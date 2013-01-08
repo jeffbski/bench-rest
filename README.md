@@ -4,15 +4,42 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
 
 [![Build Status](https://secure.travis-ci.org/jeffbski/bench-rest.png?branch=master)](http://travis-ci.org/jeffbski/bench-rest)
 
+## Contents on this page
+
+ - <a href="installation">Installation</a>
+ - <a href="prog-usage">Programmatic usage</a>
+ - <a href="cmd-usage">Command-line usage</a>
+ - <a href="goals">Goals</a>
+ - <a href="detailed-usage">Detailed usage</a>
+   - <a href="returns">Returns EventEmitter</a>
+   - <a href="stats">Stats (metrics) and errorCount benchmark results</a>
+   - <a href="run-options">Run options - number of iterations and concurrency</a>
+   - <a href="rest-flow">REST operations flow</a>
+   - <a href="tokens">Token substitution</a>
+   - <a href="pre-post">Pre/post operation processing</a>
+ - <a href="why">Why create this project?</a>
+ - <a href="tuning">Tuning</a>
+   - <a href="tuning-mac">Tuning Mac OS</a>
+ - <a href="dependencies">Dependencies</a>
+ - <a href="get-involved">Get Involved</a>
+ - <a href="license">MIT License</a>
+
+
+<a name="installation"/>
 ## Installation
 
 Requires node.js >= 0.8
 
 ```bash
+# If using programmatically
 npm install bench-rest
+
+# OR possibly with -g option if planning to use from command line
+npm install -g bench-rest
 ```
 
-## Usage
+<a name="prog-usage"/>
+## Programmatic Usage
 
 Simple single GET flow performing 100 iterations with 10 concurrent connections
 
@@ -35,6 +62,51 @@ Simple single GET flow performing 100 iterations with 10 concurrent connections
 
 See `Detailed Usage` section below for more details
 
+
+<a name="cmd-usage"/>
+## Command-line usage
+
+```bash
+# if installed with -g
+bench-rest --help
+
+# otherwise use from node_modules
+node_modules/bin/bench-rest --help
+```
+
+Outputs
+
+```
+  Usage: bench-rest [options] <flow-js-path>
+
+  Options:
+
+    -h, --help                  output usage information
+    -V, --version               output the version number
+    -n --iterations <integer>   Number of iterations to run, defaults to 1
+    -c --concurrency <integer>  Concurrent operations, defaults to 10
+    -u --user <username>        User for basic authentication, default no auth
+    -p --password <password>    Password for basic authentication
+```
+
+It has one expected required parameter which is the path to a node.js
+file which exports a REST flow. For example:
+
+```javascript
+  var flow = {
+    main: [{ get: 'http://localhost:8000/' }]  // could be an array of REST operations
+  };
+
+  module.exports = flow;
+```
+
+Check for example flows in the `examples` directory.
+
+See `Detailed Usage` for more details on creating more advanced REST flows.
+
+
+
+<a name="goals"/>
 ## Goals
 
  - Easy to create REST (HTTP/HTTPS) flows for benchmarking
@@ -50,6 +122,7 @@ See `Detailed Usage` section below for more details
  - Allows pre/post processing or verification of data
 
 
+<a name="detailed-usage"/>
 ## Detailed Usage
 
 Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
@@ -79,6 +152,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
     });
 ```
 
+<a name="returns"/>
 ### Returns EventEmitter
 
 The main function from `require('bench-rest')` will return a node.js EventEmitter instance when called with the `flow` and `runOptions`. This event emitter will emit the following events:
@@ -86,6 +160,8 @@ The main function from `require('bench-rest')` will return a node.js EventEmitte
  - `error` - emitted as an error occurs during a run. It emits parameters `err` and `ctxName` matching where the error occurred (`main`, `before`, `beforeMain`, `after`, `afterMain`)
  - `end` - emitted when the benchmark run has finished (successfully or otherwise). It emits parameters `stats` and `errorCount` (discussed below).
 
+
+<a name="stats"/>
 #### Stats (metrics) and errorCount benchmark results
 
 The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. Time is reported in milliseconds. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
@@ -123,7 +199,7 @@ stats {
         p999: 66 } } }
 ```
 
-
+<a name="run-options"/>
 ### Run options
 
 The runOptions object can have the following properties which govern the benchmark run:
@@ -133,6 +209,8 @@ The runOptions object can have the following properties which govern the benchma
  - `user` - optional user to be used for basic authentication
  - `password` - optional password to be used for basic authentication
 
+
+<a name="rest-flow"/>
 ### REST Operations in the flow
 
 The REST operations that need to be performed in either as part of the main flow or for setup and teardown are configured using the following flow properties.
@@ -158,6 +236,8 @@ Each operation can have the following properties:
  - any other properties/options which are valid for `mikeal/request` - see https://github.com/mikeal/request
  - pre/post processing - optional array as `beforeHooks` and `afterHooks` which can perform processing before and/or after an operation. See `Pre/post operation processing` section below for details.
 
+
+<a name="tokens"/>
 ### Token substitution for iteration operations
 
 To make REST flows that are independent of each other, one often wants unique URLs and unique data, so one way to make this easy is to include special tokens in the `uri`, `json`, or `data`.
@@ -169,6 +249,7 @@ Currently the token(s) replaced in the `uri`, `json`, or `data` are:
 Note: for the `json` property the `json` object is JSON.stringified, tokens substituted, then JSON.parsed back to an object so that tokens will be substituted anywhere in the structure.
 
 
+<a name="pre-post"/>
 ### Pre/post operation processing
 
 If an array of hooks is specified in an operation as `beforeHooks` and/or `afterHooks` then these synchronous operations will be done before/after the REST operation.
@@ -218,6 +299,7 @@ The properties available on the `all` object are:
  - all.cb - the cb that will be called when done
 
 
+<a name="why"/>
 ## Why create this project?
 
 It is important to understand how well your architecture performs and with each change to the system how performance is impacted. The best way to know this is to benchmark your system with each major change.
@@ -233,10 +315,12 @@ After attempting to use the variety of load testing clients and modules for benc
 
 Building your own is certainly an option but it gets tedious to make all the necessary setup and error handling to achieve a simple flow and thus this project was born.
 
-## Tuning
+<a name="tuning"/>
+## Tuning OS
 
 Each OS may need some tweaking of the configuration to be able to generate or receive a large number of concurrent connections.
 
+<a name="tuning-mac"/>
 ### Mac OS X
 
 The Mac OS X can be tweaked using the following parameters. The configuration allowed about 8K concurrent connections for a single process.
@@ -252,16 +336,14 @@ ulimit -H -n       # display hard max open files, default unlimited
 ulimit -S -n 20000  # set soft max open files
 ```
 
+<a name="dependencies"/>
 ## Dependencies
 
  - request - https://github.com/mikeal/request - for http/https operations with cookies, redirects
  - async - https://github.com/caolan/async - for limiting concurrency
  - measured - https://github.com/felixge/node-measured - for metrics
 
-## TODO
-
- - command line runner
-
+<a name="get-involved"/>
 ## Get involved
 
 If you have input or ideas or would like to get involved, you may:
@@ -270,6 +352,7 @@ If you have input or ideas or would like to get involved, you may:
  - open an issue on github to begin a discussion - <https://github.com/jeffbski/bench-rest/issues>
  - fork the repo and send a pull request (ideally with tests) - <https://github.com/jeffbski/bench-rest>
 
+<a name="license"/>
 ## License
 
  - [MIT license](http://github.com/jeffbski/bench-rest/raw/master/LICENSE)

@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+
+/*
+  Command line runner for running bench-rest flows
+
+  # run 1000 iterations with 10 concurrent users against flow defined in ./flow.js
+  bench-rest -n 1000 -c 10 './flow.js'
+*/
+
+var prog = require('commander');
+var fs = require('fs');
+var path = require('path');
+
+var VERSION = '0.0.2';
+
+prog
+  .version(VERSION)
+  .usage('[options] <flow-js-path>')
+  .option('-n --iterations <integer>', 'Number of iterations to run, defaults to 1')
+  .option('-c --concurrency <integer>', 'Concurrent operations, defaults to 10')
+  .option('-u --user <username>', 'User for basic authentication, default no auth')
+  .option('-p --password <password>', 'Password for basic authentication')
+  .parse(process.argv);
+
+if (prog.args.length !== 1) { // should only specify one file
+  process.stdout.write(prog.helpInformation());
+  prog.emit('--help');
+  process.exit(1);
+}
+
+var iterations = parseInt(prog.iterations || '1');
+var concurrency = parseInt(prog.concurrency || '10');
+if (iterations < concurrency) concurrency = iterations;  // just so displays nicely
+var user = prog.user;
+var password = prog.password;
+var flowJSPath = path.resolve(prog.args.shift());
+
+if (!fs.existsSync(flowJSPath)) {
+  console.error('Flow JS path does not exist, path: %s', flowJSPath);
+  process.exit(2);
+}
+
+var benchrest = require('../'); // require('bench-rest');
+var flow = require(flowJSPath);
+
+var msg = 'Benchmarking ' + iterations + ' iteration(s) using up to ' +
+  concurrency + ' concurrent connections';
+if (user) {
+  msg += ' using basic auth user ';
+  msg += user;
+}
+console.log(msg);
+console.log('\nUsing flow from: %s\n', flowJSPath, flow);
+console.log('\n');
+
+var runOptions = {
+  limit: concurrency,
+  iterations: iterations,
+  user: user,
+  password: password
+};
+
+benchrest(flow, runOptions)
+  .on('error', function (err, ctxName) { console.error('Failed in %s, err: ', ctxName, err); })
+  .on('end', function (stats, errorCount) {
+    console.log('\nerrors: ', errorCount);
+    console.log('stats: ', stats);
+    process.exit(errorCount);
+  });
+
+
+
+
+
+
+
