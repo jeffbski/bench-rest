@@ -20,7 +20,7 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
  - <a href="#why">Why create this project?</a>
  - <a href="#tuning">Tuning</a>
    - <a href="#tuning-mac">Tuning Mac OS</a>
- - <a href="#dependencies">Dependencies</a>
+ - <a href="#modules">Key modules leveraged</a>
  - <a href="#get-involved">Get Involved</a>
  - <a href="#license">MIT License</a>
 
@@ -336,8 +336,8 @@ ulimit -H -n       # display hard max open files, default unlimited
 ulimit -S -n 20000  # set soft max open files
 ```
 
-<a name="dependencies"/>
-## Dependencies
+<a name="modules"/>
+## Key modules leveraged
 
  - request - https://github.com/mikeal/request - for http/https operations with cookies, redirects
  - async - https://github.com/caolan/async - for limiting concurrency
