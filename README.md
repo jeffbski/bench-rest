@@ -51,6 +51,34 @@ See `Detailed Usage` section below for more details
 
 ## Detailed Usage
 
+Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
+
+```javascript
+  var flow = {
+    before: [],      // operations to do before anything
+    beforeMain: [],  // operations to do before each iteration
+    main: [  // the main flow for each iteration, #{INDEX} is unique iteration counter token
+      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
+      { get: 'http://localhost:8000/foo_#{INDEX}' }
+    ],
+    afterMain: [{ del: 'http://localhost:8000/foo_#{INDEX}' }],   // operations to do after each iteration
+    after: []        // operations to do after everything is done
+  };
+  var runOptions = {
+    limit: 10,     // concurrent connections
+    requests: 100  // number of requests to perform
+  };
+  var errors = [];
+  benchrest(flow, runOptions)
+    .on('error', function (err) { console.error(err); })
+    .on('end', function (stats, errorCount) {
+      console.log('error count: ', errorCount);
+      console.log('stats', stats);
+    });
+```
+
+### Stats (metrics) and errorCount benchmark results
+
 The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
 
 The `stats.main` will be the meter data for the main benchmark flow operations (not including the beforeMain and afterMain operations).
@@ -86,31 +114,6 @@ stats {
         p999: 66 } } }
 ```
 
-Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
-
-```javascript
-  var flow = {
-    before: [],      // operations to do before anything
-    beforeMain: [],  // operations to do before each iteration
-    main: [  // the main flow for each iteration, #{INDEX} is unique iteration counter token
-      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
-      { get: 'http://localhost:8000/foo_#{INDEX}' }
-    ],
-    afterMain: [{ del: 'http://localhost:8000/foo_#{INDEX}' }],   // operations to do after each iteration
-    after: []        // operations to do after everything is done
-  };
-  var runOptions = {
-    limit: 10,     // concurrent connections
-    requests: 100  // number of requests to perform
-  };
-  var errors = [];
-  benchrest(flow, runOptions)
-    .on('error', function (err) { console.error(err); })
-    .on('end', function (stats, errorCount) {
-      console.log('error count: ', errorCount);
-      console.log('stats', stats);
-    });
-```
 
 ### Run options
 
