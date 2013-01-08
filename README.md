@@ -353,7 +353,7 @@ If you have input or ideas or would like to get involved, you may:
  - fork the repo and send a pull request (ideally with tests) - <https://github.com/jeffbski/bench-rest>
 
 <a name="license"/>
-## License
+## License - MIT
 
  - [MIT license](http://github.com/jeffbski/bench-rest/raw/master/LICENSE)
 
