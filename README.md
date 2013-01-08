@@ -40,7 +40,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
     before: [],      // operations to do before anything
     beforeMain: [],  // operations to do before each iteration
     main: [  // the main flow for each iteration, #{INDEX} is unique iteration counter token
-      { put: 'http://localhost:8000/foo_#{INDEX}' },
+      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
       { get: 'http://localhost:8000/foo_#{INDEX}' }
     ],
     afterMain: [{ del: 'http://localhost:8000/foo_#{INDEX}' }],   // operations to do after each iteration
