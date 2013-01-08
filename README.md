@@ -14,7 +14,7 @@ npm install bench-rest
 
 ## Usage
 
-Simple single GET flow performing 100 requests with 10 concurrent connections
+Simple single GET flow performing 100 iterations with 10 concurrent connections
 
 ```javascript
   var benchrest = require('bench-rest');
@@ -23,10 +23,10 @@ Simple single GET flow performing 100 requests with 10 concurrent connections
   };
   var runOptions = {
     limit: 10,     // concurrent connections
-    requests: 100  // number of requests to perform
+    iterations: 100  // number of iterations to perform
   };
   benchrest(flow, runOptions)
-    .on('error', function (err) { console.error(err); })
+    .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
@@ -68,20 +68,27 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
   };
   var runOptions = {
     limit: 10,     // concurrent connections
-    requests: 100  // number of requests to perform
+    iterations: 100  // number of iterations to perform
   };
   var errors = [];
   benchrest(flow, runOptions)
-    .on('error', function (err) { console.error(err); })
+    .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
     });
 ```
 
-### Stats (metrics) and errorCount benchmark results
+### Returns EventEmitter
 
-The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
+The main function from `require('bench-rest')` will return a node.js EventEmitter instance when called with the `flow` and `runOptions`. This event emitter will emit the following events:
+
+ - `error` - emitted as an error occurs during a run. It emits parameters `err` and `ctxName` matching where the error occurred (`main`, `before`, `beforeMain`, `after`, `afterMain`)
+ - `end` - emitted when the benchmark run has finished (successfully or otherwise). It emits parameters `stats` and `errorCount` (discussed below).
+
+#### Stats (metrics) and errorCount benchmark results
+
+The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. Time is reported in milliseconds. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
 
 The `stats.main` will be the meter data for the main benchmark flow operations (not including the beforeMain and afterMain operations).
 
@@ -122,7 +129,7 @@ stats {
 The runOptions object can have the following properties which govern the benchmark run:
 
  - `limit` - required number of concurrent operations to limit at any given time
- - `requests` - required number of flow iterations to perform on the `main` flow (as well as `beforeMain` and `afterMain` setup/teardown operations)
+ - `iterations` - required number of flow iterations to perform on the `main` flow (as well as `beforeMain` and `afterMain` setup/teardown operations)
  - `user` - optional user to be used for basic authentication
  - `password` - optional password to be used for basic authentication
 

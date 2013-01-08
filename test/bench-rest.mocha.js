@@ -37,15 +37,15 @@ test('simple get', function (done) {
   };
   var runOptions = {
     limit: 10,
-    requests: 100
+    iterations: 100
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
-      t.equal(requests.length, runOptions.requests);
+      t.equal(requests.length, runOptions.iterations);
       done();
     });
 });
@@ -56,16 +56,16 @@ test('stats provides measured data with totalElapsed and main metrics', function
   };
   var runOptions = {
     limit: 10,
-    requests: 100
+    iterations: 100
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
       t.isNumber(stats.totalElapsed, 'should have total elapsed time in millisecs');
-      t.equal(stats.main.meter.count, runOptions.requests, 'should have count equal to the requests made');
+      t.equal(stats.main.meter.count, runOptions.iterations, 'should have count equal to the requests made');
       t.isNumber(stats.main.meter.mean, 'should have an average for iterations/sec');
       t.isNumber(stats.main.histogram.min, 'should have a min time in milliseconds for all iterations');
       t.isNumber(stats.main.histogram.max, 'should have a max time in milliseconds for all iterations');
@@ -85,15 +85,15 @@ test('simple put/get flow', function (done) {
   };
   var runOptions = {
     limit: 1,   // limiting to single at a time so can guarantee order for test verification
-    requests: 2
+    iterations: 2
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
-      t.equal(requests.length, runOptions.requests * flow.main.length);
+      t.equal(requests.length, runOptions.iterations * flow.main.length);
       t.deepEqual(requests[0], { method: 'PUT', url: '/foo', data: '"mydata"' });
       t.deepEqual(requests[1], { method: 'GET', url: '/foo', data: '' });
       t.deepEqual(requests[2], { method: 'PUT', url: '/foo', data: '"mydata"' });
@@ -111,15 +111,15 @@ test('put/get flow with token substitution', function (done) {
   };
   var runOptions = {
     limit: 1,   // limiting to single at a time so can guarantee order for test verification
-    requests: 2
+    iterations: 2
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
-      t.equal(requests.length, runOptions.requests * flow.main.length);
+      t.equal(requests.length, runOptions.iterations * flow.main.length);
       t.deepEqual(requests[0], { method: 'PUT', url: '/foo_0', data: '"mydata_0"' });
       t.deepEqual(requests[1], { method: 'GET', url: '/foo_0', data: '' });
       t.deepEqual(requests[2], { method: 'PUT', url: '/foo_1', data: '"mydata_1"' });
@@ -141,15 +141,15 @@ test('put/get flow with before, beforeMain, afterMain, after', function (done) {
   };
   var runOptions = {
     limit: 1,   // limiting to single at a time so can guarantee order for test verification
-    requests: 2
+    iterations: 2
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
-      var totalRequests = runOptions.requests *
+      var totalRequests = runOptions.iterations *
         (flow.main.length + flow.beforeMain.length + flow.afterMain.length) +
         flow.before.length + flow.after.length;
       t.equal(requests.length, totalRequests);
@@ -176,34 +176,36 @@ test('errors should be emitted and errorCount should return total', function (do
   };
   var runOptions = {
     limit: 2,
-    requests: 2
+    iterations: 2
   };
   var errors = [];
   requests.length = 0;
   benchrest(flow, runOptions)
-    .on('error', function (err) { errors.push(err); })
+    .on('error', function (err, ctxName) { errors.push({ err: err, ctxName: ctxName }); })
     .on('end', function (stats, errorCount) {
-      t.equal(errors.length, runOptions.requests, 'should have one error per iteration');
-      t.match(errors[0].message, /401/);
-      t.match(errors[1].message, /401/);
+      t.equal(errors.length, runOptions.iterations, 'should have one error per iteration');
+      t.match(errors[0].err.message, /401/);
+      t.equal(errors[0].ctxName, 'main');
+      t.match(errors[1].err.message, /401/);
+      t.equal(errors[1].ctxName, 'main');
       done();
     });
 });
 
 
-test('missing requests property throws error', function () {
+test('missing iterations property throws error', function () {
   var flow = {
     main: [{ get: 'http://localhost:8000' }]
   };
   var runOptions = {
     limit: 10,
-    // requests: 100
+    // iterations: 100
   };
   function runWhichThrows() {
     benchrest(flow, runOptions);
   }
-  t.throws(runWhichThrows, /benchmark runOptions requires requests and limit properties/,
-           'should throw when missing required property runOptions.requests');
+  t.throws(runWhichThrows, /benchmark runOptions requires iterations and limit properties/,
+           'should throw when missing required property runOptions.iterations');
 });
 
 test('missing limit property throws error', function () {
@@ -212,12 +214,12 @@ test('missing limit property throws error', function () {
   };
   var runOptions = {
     // limit: 10,
-    requests: 100
+    iterations: 100
   };
   function runWhichThrows() {
     benchrest(flow, runOptions);
   }
-  t.throws(runWhichThrows, /benchmark runOptions requires requests and limit properties/,
+  t.throws(runWhichThrows, /benchmark runOptions requires iterations and limit properties/,
            'should throw when missing required property runOptions.limit');
 });
 
@@ -227,7 +229,7 @@ test('missing main flow throws error', function () {
   };
   var runOptions = {
     limit: 10,
-    requests: 100
+    iterations: 100
   };
   function runWhichThrows() {
     benchrest(flow, runOptions);
