@@ -69,10 +69,10 @@ See <a href="#detailed-usage">Detailed Usage</a> section below for more details
 
 ```bash
 # if installed with -g
-bench-rest --help
+bench-rest
 
 # otherwise use from node_modules
-node_modules/bin/bench-rest --help
+node_modules/bin/bench-rest
 ```
 
 Outputs
