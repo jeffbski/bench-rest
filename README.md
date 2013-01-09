@@ -78,25 +78,33 @@ node_modules/bin/bench-rest --help
 Outputs
 
 ```
-  Usage: bench-rest [options] <flow-js-path>
+  Usage: bench-rest [options] <flow-js-path-or-GET-URL>
 
   Options:
 
-    -h, --help                  output usage information
-    -V, --version               output the version number
-    -n --iterations <integer>   Number of iterations to run, defaults to 1
-    -c --concurrency <integer>  Concurrent operations, defaults to 10
-    -u --user <username>        User for basic authentication, default no auth
-    -p --password <password>    Password for basic authentication
+    -h, --help                   output usage information
+    -V, --version                output the version number
+    -n --iterations <integer>    Number of iterations to run, defaults to 1
+    -c --concurrency <integer>   Concurrent operations, defaults to 10
+    -u --user <username>         User for basic authentication, default no auth
+    -p --password <password>     Password for basic authentication
+    -e --evaluate <flow-string>  Evaluate flow from string, not file
+
+  Examples:
+
+    bench-flow -n 100 -c 100 ./examples/simple.js
+    bench-flow -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js
+    bench-flow -n 10 -c 2 http://localhost:8000/
+    bench-flow -n 10 -c 2 -e "{ head: 'http://localhost:8000/' }"
 ```
 
-Typical use would be as follows:
+Running this
 
 ```bash
 bench-rest -n 1000 -c 50 ./examples/simple.js
 ```
 
-which would output
+would output
 
 ```
 Benchmarking 1000 iteration(s) using up to 50 concurrent connections
