@@ -76,6 +76,9 @@ test('stats provides measured data with totalElapsed and main metrics', function
     });
 });
 
+
+
+
 test('simple put/get flow', function (done) {
   var flow = {
     main: [
@@ -127,6 +130,61 @@ test('put/get flow with token substitution', function (done) {
       done();
     });
 });
+
+
+test('allow flow to be defined as single string URL implying GET', function (done) {
+  var flow = 'http://localhost:8000';
+  var runOptions = {
+    limit: 10,
+    iterations: 100
+  };
+  var errors = [];
+  requests.length = 0;
+  benchrest(flow, runOptions)
+    .on('error', function (err, ctxName) { errors.push(err); })
+    .on('end', function (stats, errorCount) {
+      if (errorCount) done(errors[0] || 'unknown error');
+      t.equal(requests.length, runOptions.iterations);
+      done();
+    });
+});
+
+test('allow flow to be defined as single operation', function (done) {
+  var flow = { get: 'http://localhost:8000' };
+  var runOptions = {
+    limit: 10,
+    iterations: 100
+  };
+  var errors = [];
+  requests.length = 0;
+  benchrest(flow, runOptions)
+    .on('error', function (err, ctxName) { errors.push(err); })
+    .on('end', function (stats, errorCount) {
+      if (errorCount) done(errors[0] || 'unknown error');
+      t.equal(requests.length, runOptions.iterations);
+      done();
+    });
+});
+
+test('allow flow to be defined as array of main operations', function (done) {
+  var flow = [{ get: 'http://localhost:8000' }];
+  var runOptions = {
+    limit: 10,
+    iterations: 100
+  };
+  var errors = [];
+  requests.length = 0;
+  benchrest(flow, runOptions)
+    .on('error', function (err, ctxName) { errors.push(err); })
+    .on('end', function (stats, errorCount) {
+      if (errorCount) done(errors[0] || 'unknown error');
+      t.equal(requests.length, runOptions.iterations);
+      done();
+    });
+});
+
+
+
 
 test('put/get flow with before, beforeMain, afterMain, after', function (done) {
   var flow = {
@@ -193,6 +251,18 @@ test('errors should be emitted and errorCount should return total', function (do
 });
 
 
+test('null runOptions throws error', function () {
+  var flow = {
+    main: [{ get: 'http://localhost:8000' }]
+  };
+  var runOptions = null;
+  function runWhichThrows() {
+    benchrest(flow, runOptions);
+  }
+  t.throws(runWhichThrows, /benchmark runOptions requires iterations and limit properties/,
+           'should throw when missing required property runOptions.iterations');
+});
+
 test('missing iterations property throws error', function () {
   var flow = {
     main: [{ get: 'http://localhost:8000' }]
@@ -234,8 +304,22 @@ test('missing main flow throws error', function () {
   function runWhichThrows() {
     benchrest(flow, runOptions);
   }
-  t.throws(runWhichThrows, /benchmark flow requires an array of operations as property main/,
-           'should throw when missing flow.main');
+  t.throws(runWhichThrows, /benchmark flow requires main operations, missing flow\.main\?/,
+           'should throw when cannot find the main operations');
+
+});
+
+test('null flow throws error', function () {
+  var flow = null;
+  var runOptions = {
+    limit: 10,
+    iterations: 100
+  };
+  function runWhichThrows() {
+    benchrest(flow, runOptions);
+  }
+  t.throws(runWhichThrows, /benchmark flow requires main operations, missing flow\.main\?/,
+           'should throw when cannot find the main operations');
 
 });
 

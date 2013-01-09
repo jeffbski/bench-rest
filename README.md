@@ -13,6 +13,7 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
  - <a href="#detailed-usage">Detailed usage</a>
    - <a href="#returns">Returns EventEmitter</a>
    - <a href="#stats">Stats (metrics) and errorCount benchmark results</a>
+   - <a href="#shortcuts">Shortcuts for expressing the REST flow</a>
    - <a href="#run-options">Run options - number of iterations and concurrency</a>
    - <a href="#rest-flow">REST operations flow</a>
    - <a href="#tokens">Token substitution</a>
@@ -236,6 +237,23 @@ stats {
         p95: 17,
         p99: 65.53999999999976,
         p999: 66 } } }
+```
+
+<a name="shortcuts"/>
+### Shortcuts for expressing flow
+
+If you have very simple flow that does not need setup and teardown, then there are a few shortcuts for expressing the flow.
+
+ - pass flow as just a string URL - it will perform a GET on this URL as the main flow, ex: `var flow = 'http://localhost:8000/';`
+ - pass flow as just a single REST operation, ex: `var flow = { head: 'http://localhost:8000/' };`
+ - pass flow as array of REST operations
+
+```javascript
+// passing as array implies no setup/teardown and these are the main operations
+var flow = [
+  { put: 'http://localhost:8000/foo', json: 'mydata' },
+  { get: 'http://localhost:8000/foo' }
+];
 ```
 
 <a name="run-options"/>

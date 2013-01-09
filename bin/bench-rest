@@ -10,22 +10,53 @@
 var prog = require('commander');
 var fs = require('fs');
 var path = require('path');
+var benchrest = require('../'); // require('bench-rest');
 
-var VERSION = '0.0.2';
+var packageJSON = fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8');
+var package = JSON.parse(packageJSON);
+var VERSION = package.version;
 
 prog
   .version(VERSION)
-  .usage('[options] <flow-js-path>')
+  .usage('[options] <flow-js-path-or-GET-URL>')
   .option('-n --iterations <integer>', 'Number of iterations to run, defaults to 1')
   .option('-c --concurrency <integer>', 'Concurrent operations, defaults to 10')
   .option('-u --user <username>', 'User for basic authentication, default no auth')
   .option('-p --password <password>', 'Password for basic authentication')
+  .option('-e --evaluate <flow-string>', 'Evaluate flow from string, not file')
   .parse(process.argv);
 
-if (prog.args.length !== 1) { // should only specify one file
-  process.stdout.write(prog.helpInformation());
-  prog.emit('--help');
-  process.exit(1);
+prog.on('--help', function () {
+  console.log('  Examples:');
+  console.log('');
+  console.log('    bench-flow -n 100 -c 100 ./examples/simple.js');
+  console.log('    bench-flow -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js');
+  console.log('    bench-flow -n 10 -c 2 http://localhost:8000/');
+  console.log('    bench-flow -n 10 -c 2 -e "{ head: \'http://localhost:8000/\' }"');
+  console.log('');
+});
+
+var flow;
+
+if (prog.evaluate) { // evaluate option specified
+  if (prog.args.length !== 0) { // if using evaluate then no file is specified
+    console.error('when using evaluate option no file must be specified');
+    process.exit(1);
+  }
+  var strFlow = prog.evaluate.trim();
+  if (!/^(\{|\[|'|")/.test(strFlow)) strFlow = '"' + strFlow + '"'; // if raw str, wrap
+  try {
+    eval('flow = ' + strFlow);
+  } catch (err) {
+    console.error('failed to evaluate flow str: ', strFlow, err);
+    process.exit(2);
+  }
+} else { // normal, not evaluate
+  if (prog.args.length !== 1) { // should only specify one file
+    process.stdout.write(prog.helpInformation());
+    prog.emit('--help');
+    process.exit(3);
+  }
 }
 
 var iterations = parseInt(prog.iterations || '1');
@@ -33,15 +64,24 @@ var concurrency = parseInt(prog.concurrency || '10');
 if (iterations < concurrency) concurrency = iterations;  // just so displays nicely
 var user = prog.user;
 var password = prog.password;
-var flowJSPath = path.resolve(prog.args.shift());
 
-if (!fs.existsSync(flowJSPath)) {
-  console.error('Flow JS path does not exist, path: %s', flowJSPath);
-  process.exit(2);
+var flowFromMsg;
+if (!flow) {
+  var flowJSPathOrGetURL  = prog.args.shift().trim();
+  if (/^http/.test(flowJSPathOrGetURL)) flow = flowJSPathOrGetURL; // specify flow as just GET str
+
+  if (!flow) {
+    var absPathFlowJS = path.resolve(flowJSPathOrGetURL);
+    if (!fs.existsSync(flowJSPathOrGetURL)) {
+      console.error('Flow JS path does not exist, path: %s', flowJSPathOrGetURL);
+      process.exit(4);
+    }
+    flow = require(absPathFlowJS);
+    flowFromMsg = 'Using flow from: ' + absPathFlowJS;
+  }
 }
 
-var benchrest = require('../'); // require('bench-rest');
-var flow = require(flowJSPath);
+
 
 var msg = 'Benchmarking ' + iterations + ' iteration(s) using up to ' +
   concurrency + ' concurrent connections';
@@ -50,7 +90,8 @@ if (user) {
   msg += user;
 }
 console.log(msg);
-console.log('\nUsing flow from: %s\n', flowJSPath, flow);
+if (flowFromMsg) console.log('\n%s\n', flowFromMsg, flow);
+else console.log('\nflow: ', flow);
 console.log('\n');
 
 var runOptions = {
