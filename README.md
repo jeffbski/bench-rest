@@ -89,6 +89,45 @@ Outputs
     -p --password <password>    Password for basic authentication
 ```
 
+Typical use would be as follows:
+
+```bash
+bench-rest -n 1000 -c 50 ./examples/simple.js
+```
+
+which would output
+
+```
+Benchmarking 1000 iteration(s) using up to 50 concurrent connections
+
+Using flow from: /Users/barczewskij/projects/bench-rest/examples/simple.js
+ { main: [ { get: 'http://localhost:8000/' } ] }
+
+errors:  0
+stats:  { totalElapsed: 894,
+  main:
+   { meter:
+      { mean: 1240.6947890818858,
+        count: 1000,
+        currentRate: 1240.6947890818858,
+        '1MinuteRate': 0,
+        '5MinuteRate': 0,
+        '15MinuteRate': 0 },
+     histogram:
+      { min: 4,
+        max: 89,
+        sum: 41603,
+        variance: 242.0954864864864,
+        mean: 41.603,
+        stddev: 15.55941793533699,
+        count: 1000,
+        median: 42,
+        p75: 50,
+        p95: 70.94999999999993,
+        p99: 81.99000000000001,
+        p999: 88.99900000000002 } } }
+```
+
 It has one expected required parameter which is the path to a node.js
 file which exports a REST flow. For example:
 
