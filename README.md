@@ -61,7 +61,7 @@ Simple single GET flow performing 100 iterations with 10 concurrent connections
     });
 ```
 
-See `Detailed Usage` section below for more details
+See <a href="#detailed-usage">Detailed Usage</a> section below for more details
 
 
 <a name="cmd-usage"/>
@@ -150,7 +150,7 @@ file which exports a REST flow. For example:
 
 Check for example flows in the `examples` directory.
 
-See `Detailed Usage` for more details on creating more advanced REST flows.
+See <a href="#detailed-usage">Detailed Usage</a> for more details on creating more advanced REST flows.
 
 
 
@@ -299,7 +299,7 @@ Each operation can have the following properties:
  - `json` optionally provide data which will be JSON stringified and provided as body also setting content type to application/json, ex: `{ put: 'http://localhost:8000/foo', json: { foo: 10 } }`
  - `headers` - optional headers to set, ex: `{ get: 'http://localhost:8000/foo', headers: { 'Accept-Encoding': 'gzip'}`
  - any other properties/options which are valid for `mikeal/request` - see https://github.com/mikeal/request
- - pre/post processing - optional array as `beforeHooks` and `afterHooks` which can perform processing before and/or after an operation. See `Pre/post operation processing` section below for details.
+ - pre/post processing - optional array as `beforeHooks` and `afterHooks` which can perform processing before and/or after an operation. See <a href="#pre-post">Pre/post operation processing</a> section below for details.
 
 
 <a name="tokens"/>
