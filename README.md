@@ -196,7 +196,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
   var errors = [];
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
-    .on('progress', function (stats, perc) { console.log('Progress: %s complete'); })
+    .on('progress', function (stats, perc) { console.log('Progress: %s complete', perc); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
