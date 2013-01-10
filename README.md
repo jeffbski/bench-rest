@@ -194,6 +194,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
   var errors = [];
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
+    .on('progress', function (stats, perc) { console.log('Progress: %s complete'); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
@@ -206,6 +207,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
 The main function from `require('bench-rest')` will return a node.js EventEmitter instance when called with the `flow` and `runOptions`. This event emitter will emit the following events:
 
  - `error` - emitted as an error occurs during a run. It emits parameters `err` and `ctxName` matching where the error occurred (`main`, `before`, `beforeMain`, `after`, `afterMain`)
+ - `progress` - emitted periodically as iterations complete. It emits parameters `stats` and `percentComplete`. The `stats` is the current `measured` stats (discussed below). The interval at which progress is output is controlled by the runOption.progress in milliseconds.
  - `end` - emitted when the benchmark run has finished (successfully or otherwise). It emits parameters `stats` and `errorCount` (discussed below).
 
 
@@ -273,7 +275,7 @@ The runOptions object can have the following properties which govern the benchma
  - `iterations` - required number of flow iterations to perform on the `main` flow (as well as `beforeMain` and `afterMain` setup/teardown operations)
  - `user` - optional user to be used for basic authentication
  - `password` - optional password to be used for basic authentication
-
+ - `progress` - optional, if non-zero number is provided it enables the output of progress events each time this number of milliseconds has passed
 
 <a name="rest-flow"/>
 ### REST Operations in the flow

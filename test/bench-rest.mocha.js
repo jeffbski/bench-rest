@@ -50,6 +50,34 @@ test('simple get', function (done) {
     });
 });
 
+test('simple get with progress', function (done) {
+  var flow = {
+    main: [{ get: 'http://localhost:8000' }]
+  };
+  var runOptions = {
+    limit: 10,
+    iterations: 100,
+    progress: 10  // for testing set low, normally set higher like 1000
+  };
+  var errors = [];
+  requests.length = 0;
+  var progressFired = false;
+  benchrest(flow, runOptions)
+    .on('error', function (err, ctxName) { errors.push(err); })
+    .on('progress', function (stats, percent) {
+      progressFired = true;
+      t.isNumber(stats.main.meter.count, 'should have number of iterations completed');
+      t.isNumber(percent, 'should have percent complete');
+    })
+    .on('end', function (stats, errorCount) {
+      if (errorCount) done(errors[0] || 'unknown error');
+      t.equal(requests.length, runOptions.iterations);
+      t.ok(progressFired, 'progress event should have fired');
+      done();
+    });
+});
+
+
 test('stats provides measured data with totalElapsed and main metrics', function (done) {
   var flow = {
     main: [{ get: 'http://localhost:8000' }]
@@ -65,7 +93,7 @@ test('stats provides measured data with totalElapsed and main metrics', function
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');
       t.isNumber(stats.totalElapsed, 'should have total elapsed time in millisecs');
-      t.equal(stats.main.meter.count, runOptions.iterations, 'should have count equal to the requests made');
+      t.equal(stats.main.meter.count, runOptions.iterations, 'should have count equal to the iterations completed');
       t.isNumber(stats.main.meter.mean, 'should have an average for iterations/sec');
       t.isNumber(stats.main.histogram.min, 'should have a min time in milliseconds for all iterations');
       t.isNumber(stats.main.histogram.max, 'should have a max time in milliseconds for all iterations');
