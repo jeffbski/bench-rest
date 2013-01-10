@@ -10,6 +10,7 @@
 var prog = require('commander');
 var fs = require('fs');
 var path = require('path');
+var ProgressBar = require('progress');
 var benchrest = require('../'); // require('bench-rest');
 
 var packageJSON = fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8');
@@ -21,20 +22,24 @@ prog
   .usage('[options] <flow-js-path-or-GET-URL>')
   .option('-n --iterations <integer>', 'Number of iterations to run, defaults to 1')
   .option('-c --concurrency <integer>', 'Concurrent operations, defaults to 10')
+  .option('-d --progress <integer>', 'Display progress bar (> 0), update every N ms, defaults 1000')
   .option('-u --user <username>', 'User for basic authentication, default no auth')
   .option('-p --password <password>', 'Password for basic authentication')
   .option('-e --evaluate <flow-string>', 'Evaluate flow from string, not file')
   .parse(process.argv);
 
+var execName = prog._name;
+
 prog.on('--help', function () {
   console.log('  Examples:');
   console.log('');
-  console.log('    bench-flow -n 100 -c 100 ./examples/simple.js');
-  console.log('    bench-flow -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js');
-  console.log('    bench-flow -n 10 -c 2 http://localhost:8000/');
-  console.log('    bench-flow -n 10 -c 2 -e "{ head: \'http://localhost:8000/\' }"');
+  console.log('    %s -n 100 -c 100 ./examples/simple.js', execName);
+  console.log('    %s -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js', execName);
+  console.log('    %s -n 10 -c 2 http://localhost:8000/', execName);
+  console.log('    %s -n 10 -c 2 -e "{ head: \'http://localhost:8000/\' }"', execName);
   console.log('');
 });
+
 
 var flow;
 
@@ -64,6 +69,7 @@ var concurrency = parseInt(prog.concurrency || '10');
 if (iterations < concurrency) concurrency = iterations;  // just so displays nicely
 var user = prog.user;
 var password = prog.password;
+var progress = parseInt(prog.progress || 1000);
 
 var flowFromMsg;
 if (!flow) {
@@ -92,19 +98,38 @@ if (user) {
 console.log(msg);
 if (flowFromMsg) console.log('\n%s\n', flowFromMsg, flow);
 else console.log('\nflow: ', flow);
-console.log('\n');
 
 var runOptions = {
   limit: concurrency,
   iterations: iterations,
   user: user,
-  password: password
+  password: password,
+  progress: progress
 };
+
+
+var barOptions = {
+  complete: '=',
+  incomplete: ' ',
+  width: 40,
+  total: 100
+};
+var bar = (progress) ? new ProgressBar('Progress [:bar] :percent :etas', barOptions) : null;
+var percentDone = 0;
+
+function updateBar(percentNow) {
+  if (!bar || percentNow <= percentDone) return; // if same or less return
+  var inc = percentNow - percentDone;
+  bar.tick(inc);
+  percentDone = percentNow;
+}
 
 benchrest(flow, runOptions)
   .on('error', function (err, ctxName) { console.error('Failed in %s, err: ', ctxName, err); })
+  .on('progress', function (stats, percent) { updateBar(percent); })  // only if progress enabled
   .on('end', function (stats, errorCount) {
-    console.log('\nerrors: ', errorCount);
+    updateBar(100);
+    console.log('\n\nerrors: ', errorCount);
     console.log('stats: ', stats);
     process.exit(errorCount);
   });

@@ -86,16 +86,17 @@ Outputs
     -V, --version                output the version number
     -n --iterations <integer>    Number of iterations to run, defaults to 1
     -c --concurrency <integer>   Concurrent operations, defaults to 10
+    -d --progress <integer>      Display progress bar (> 0), update every N ms, defaults 1000
     -u --user <username>         User for basic authentication, default no auth
     -p --password <password>     Password for basic authentication
     -e --evaluate <flow-string>  Evaluate flow from string, not file
 
   Examples:
 
-    bench-flow -n 100 -c 100 ./examples/simple.js
-    bench-flow -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js
-    bench-flow -n 10 -c 2 http://localhost:8000/
-    bench-flow -n 10 -c 2 -e "{ head: 'http://localhost:8000/' }"
+    bench-rest -n 100 -c 100 ./examples/simple.js
+    bench-rest -n 100 -c 100 -u "joe" -p "secret" /foo/flow.js
+    bench-rest -n 10 -c 2 http://localhost:8000/
+    bench-rest -n 10 -c 2 -e "{ head: 'http://localhost:8000/' }"
 ```
 
 Running this
@@ -111,6 +112,7 @@ Benchmarking 1000 iteration(s) using up to 50 concurrent connections
 
 Using flow from: /Users/barczewskij/projects/bench-rest/examples/simple.js
  { main: [ { get: 'http://localhost:8000/' } ] }
+Progress [=======================================] 100% 0.0s
 
 errors:  0
 stats:  { totalElapsed: 894,
