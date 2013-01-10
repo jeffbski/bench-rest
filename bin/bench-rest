@@ -40,6 +40,10 @@ prog.on('--help', function () {
   console.log('');
 });
 
+process.on('SIGINT', function () {
+  console.log('\nUser interrupt: exiting...');
+  process.exit(100);
+});
 
 var flow;
 
