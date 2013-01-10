@@ -196,7 +196,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
   var errors = [];
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
-    .on('progress', function (stats, perc) { console.log('Progress: %s complete', perc); })
+    .on('progress', function (stats, percent) { console.log('Progress: %s complete', percent); })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
@@ -218,9 +218,20 @@ The main function from `require('bench-rest')` will return a node.js EventEmitte
 
 The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. Time is reported in milliseconds. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
 
+`stats.totalElapsed` is the elapsed time in milliseconds for the entire run including all setup and teardown operations
+
 The `stats.main` will be the meter data for the main benchmark flow operations (not including the beforeMain and afterMain operations).
 
-`stats.totalElapsed` is the elapsed time in milliseconds for the entire run including all setup and teardown operations
+A couple key metrics to be aware of:
+
+ - `stats.main.mean` - average iterations / sec
+ - `stats.main.count` - iterations completed
+ - `stats.main.currentRate` - iterations / sec at this moment (mainly useful when monitoring progress)
+ - `stats.main.1MinuteRate` - iterations / sec for the last minute (only relevant if more than 1 minute has passed)
+ - `stats.main.histogram.min` - the minimum time any iteration took (milliseconds)
+ - `stats.main.histogram.max` - the maximum time any iteration took (milliseconds)
+ - `stats.main.histogram.mean` - the average time any iteration took (milliseconds)
+ - `stats.main.histogram.p95` - the amount of time that 95% of all iterations completed within (milliseconds)
 
 The output of the above run will look something like:
 
