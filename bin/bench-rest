@@ -10,7 +10,7 @@
 var prog = require('commander');
 var fs = require('fs');
 var path = require('path');
-var ProgressBar = require('progress');
+var ProgressBar = require('progress2');
 var benchrest = require('../'); // require('bench-rest');
 
 var packageJSON = fs.readFileSync(path.join(__dirname, '../package.json'), 'utf8');
@@ -129,7 +129,7 @@ function updateBar(percentNow) {
 }
 
 benchrest(flow, runOptions)
-  .on('error', function (err, ctxName) { console.error('Failed in %s, err: ', ctxName, err); })
+  .on('error', function (err, ctxName) { console.error('\nFailed in %s, err: ', ctxName, err); })
   .on('progress', function (stats, percent) { updateBar(percent); })  // only if progress enabled
   .on('end', function (stats, errorCount) {
     updateBar(100);
