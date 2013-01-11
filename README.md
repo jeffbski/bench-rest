@@ -42,13 +42,22 @@ npm install -g bench-rest
 <a name="prog-usage"/>
 ## Programmatic Usage
 
-Simple single GET flow performing 100 iterations with 10 concurrent connections
+Simple flow performing 100 iterations with 10 concurrent connections
 
 ```javascript
   var benchrest = require('bench-rest');
+  var flow = 'http://localhost:8000/';  // can use as simple single GET
+
+  // OR more powerfully define an array of REST operations with substitution
+  // This does a unique PUT and then a GET for each iteration
   var flow = {
-    main: [{ get: 'http://localhost:8000/' }]  // could be an array of REST operations
+    main: [
+      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
+      { get: 'http://localhost:8000/foo_#{INDEX}' }
+    ]
   };
+  // There are even more flow options like setup and teardown, see detailed usage
+
   var runOptions = {
     limit: 10,     // concurrent connections
     iterations: 100  // number of iterations to perform
