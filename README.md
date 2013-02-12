@@ -331,12 +331,11 @@ Each operation can have the following properties:
 
 To make REST flows that are independent of each other, one often wants unique URLs and unique data, so one way to make this easy is to include special tokens in the `uri`, `json`, or `data`.
 
-Currently the token(s) replaced in the `uri`, `json`, or `data` are:
+Currently the token(s) replaced in the `uri`, `json`, or `body` are:
 
  - `#{INDEX}` - replaced with the zero based counter/index of the iteration
 
-Note: for the `json` property the `json` object is JSON.stringified, tokens substituted, then JSON.parsed back to an object so that tokens will be substituted anywhere in the structure.
-
+Note: for the `json` property the `json` object is JSON.stringified, tokens substituted, then JSON.parsed back to an object so that tokens will be substituted anywhere in the structure. If subsitution is not needed (no `#{INDEX}` in the structure, then no copy (stringify/parse) will be performed.
 
 <a name="pre-post"/>
 ### Pre/post operation processing
@@ -360,6 +359,7 @@ The list of current built-in afterHooks:
 
  - `saveEtag` - afterHook which causes an etag to be saved into an object cache specific to this iteration. Stored by URI. If the etag was the result of a POST operation and a `Location` header was provided, then the URI at the `Location` will be used.
  - `ignoreStatus` - afterHookif an operation could possibly return an error code that you want to ignore and always continue anyway. Failing status codes are those that are greater than or equal to 400. Normal operation would be to terminate an iteration if there is a failure status code in any `before`, `beforeMain`, or `main` operation.
+ - `verify2XX` - afterHook which fails if an operation's status code was not in 200-299 range. If you don't want a redirect followed, be sure to add the request option `followRedirect: false`
 
 
 To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted.
