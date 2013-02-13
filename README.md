@@ -2,6 +2,8 @@
 
 Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API's using a simple structure/DSL can create REST flows with setup and teardown and returns (measured) metrics.
 
+Roughly `bench-rest` = [mikeal/request](https://github.com/mikeal/request) + [caolan/async](https://github.com/caolan/async) + [felixge/node-measured](https://github.com/felixge/node-measured)
+
 [![Build Status](https://secure.travis-ci.org/jeffbski/bench-rest.png?branch=master)](http://travis-ci.org/jeffbski/bench-rest)
 
 ## Contents on this page
