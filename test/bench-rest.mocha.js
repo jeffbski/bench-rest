@@ -64,10 +64,11 @@ test('simple get with progress', function (done) {
   var progressFired = false;
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
-    .on('progress', function (stats, percent) {
+    .on('progress', function (stats, percent, concurrent) {
       progressFired = true;
       t.isNumber(stats.main.meter.count, 'should have number of iterations completed');
       t.isNumber(percent, 'should have percent complete');
+      t.isNumber(concurrent, 'should have a concurrent connections count');
     })
     .on('end', function (stats, errorCount) {
       if (errorCount) done(errors[0] || 'unknown error');

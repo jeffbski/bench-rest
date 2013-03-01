@@ -123,7 +123,7 @@ Benchmarking 1000 iteration(s) using up to 50 concurrent connections
 
 Using flow from: /Users/barczewskij/projects/bench-rest/examples/simple.js
  { main: [ { get: 'http://localhost:8000/' } ] }
-Progress [=======================================] 100% 0.0s
+Progress [=======================================] 100% 0.0s conc:49
 
 errors:  0
 stats:  { totalElapsed: 894,
@@ -181,7 +181,7 @@ See <a href="#detailed-usage">Detailed Usage</a> for more details on creating mo
  - Errors will automatically stop an iterations flow and be tracked
  - Easy use and handling of etags
  - Allows pre/post processing or verification of data
-
+ - Provide programmatically and via cmd line the dynamic concurrency count
 
 <a name="detailed-usage"/>
 ## Detailed Usage
@@ -207,7 +207,9 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
   var errors = [];
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { console.error('Failed in %s with err: ', ctxName, err); })
-    .on('progress', function (stats, percent) { console.log('Progress: %s complete', percent); })
+    .on('progress', function (stats, percent, concurrent) {
+      console.log('Progress: %s complete', percent);
+    })
     .on('end', function (stats, errorCount) {
       console.log('error count: ', errorCount);
       console.log('stats', stats);
@@ -220,7 +222,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
 The main function from `require('bench-rest')` will return a node.js EventEmitter instance when called with the `flow` and `runOptions`. This event emitter will emit the following events:
 
  - `error` - emitted as an error occurs during a run. It emits parameters `err` and `ctxName` matching where the error occurred (`main`, `before`, `beforeMain`, `after`, `afterMain`)
- - `progress` - emitted periodically as iterations complete. It emits parameters `stats` and `percentComplete`. The `stats` is the current `measured` stats (discussed below). The interval at which progress is output is controlled by the runOption.progress in milliseconds.
+ - `progress` - emitted periodically as iterations complete. It emits parameters `stats`, `percentComplete`, and `concurrent`. The `stats` is the current `measured` stats (discussed below). The `concurrent` param is the concurrent connection count at that point in time. The interval at which progress is output is controlled by the runOption.progress in milliseconds.
  - `end` - emitted when the benchmark run has finished (successfully or otherwise). It emits parameters `stats` and `errorCount` (discussed below).
 
 
