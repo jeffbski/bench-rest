@@ -437,6 +437,13 @@ ulimit -S -n 20000  # set soft max open files
  - measured - https://github.com/felixge/node-measured - for metrics
 
 <a name="get-involved"/>
+
+## Tested on Node versions
+
+ - 0.8
+ - 0.10
+ - 0.11
+
 ## Get involved
 
 If you have input or ideas or would like to get involved, you may:
