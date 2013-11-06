@@ -96,6 +96,7 @@ Outputs
     -h, --help                   output usage information
     -V, --version                output the version number
     -n --iterations <integer>    Number of iterations to run, defaults to 1
+    -a --prealloc <integer>      Max iterations to preallocate, defaults 100000
     -c --concurrency <integer>   Concurrent operations, defaults to 10
     -d --progress <integer>      Display progress bar (> 0), update every N ms, defaults 1000
     -u --user <username>         User for basic authentication, default no auth
@@ -201,8 +202,9 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
     after: []        // operations to do after everything is done
   };
   var runOptions = {
-    limit: 10,     // concurrent connections
-    iterations: 100  // number of iterations to perform
+    limit: 10,         // concurrent connections
+    iterations: 1000,  // number of iterations to perform
+    prealloc: 100      // only preallocate up to 100 before starting
   };
   var errors = [];
   benchrest(flow, runOptions)
@@ -299,6 +301,7 @@ The runOptions object can have the following properties which govern the benchma
 
  - `limit` - required number of concurrent operations to limit at any given time
  - `iterations` - required number of flow iterations to perform on the `main` flow (as well as `beforeMain` and `afterMain` setup/teardown operations)
+ - `prealloc` - optional max number of iterations to preallocate before starting, defaults to lesser of 100K and `iterations`. When using large number of iterations or large payload per iteration, it can be necessary to adjust this for optimal memory use.
  - `user` - optional user to be used for basic authentication
  - `password` - optional password to be used for basic authentication
  - `progress` - optional, if non-zero number is provided it enables the output of progress events each time this number of milliseconds has passed

@@ -21,6 +21,7 @@ prog
   .version(VERSION)
   .usage('[options] <flow-js-path-or-GET-URL>')
   .option('-n --iterations <integer>', 'Number of iterations to run, defaults to 1')
+  .option('-a --prealloc <integer>', 'Max iterations to preallocate, defaults 100000')
   .option('-c --concurrency <integer>', 'Concurrent operations, defaults to 10')
   .option('-d --progress <integer>', 'Display progress bar (> 0), update every N ms, defaults 1000')
   .option('-u --user <username>', 'User for basic authentication, default no auth')
@@ -68,8 +69,9 @@ if (prog.evaluate) { // evaluate option specified
   }
 }
 
-var iterations = parseInt(prog.iterations || '1');
-var concurrency = parseInt(prog.concurrency || '10');
+var iterations = parseInt(prog.iterations || '1', 10);
+var prealloc = parseInt(prog.prealloc || '100000', 10)
+var concurrency = parseInt(prog.concurrency || '10', 10);
 if (iterations < concurrency) concurrency = iterations;  // just so displays nicely
 var user = prog.user;
 var password = prog.password;
@@ -106,6 +108,7 @@ else console.log('\nflow: ', flow);
 var runOptions = {
   limit: concurrency,
   iterations: iterations,
+  prealloc: prealloc,
   user: user,
   password: password,
   progress: progress
@@ -135,7 +138,7 @@ benchrest(flow, runOptions)
     updateBar(percent, concurrent, ips);
   })
   .on('end', function (stats, errorCount) {
-    updateBar(100, 0);
+    updateBar(100, 0, Math.round(stats.main.meter.mean));
     console.log('\n\nerrors: ', errorCount);
     console.log('stats: ', stats);
     process.exit(errorCount);
