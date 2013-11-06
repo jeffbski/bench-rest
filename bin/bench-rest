@@ -118,21 +118,21 @@ var barOptions = {
   width: 40,
   total: 100
 };
-var bar = (progress) ? new ProgressBar('Progress [:bar] :percent :etas conc::concurrent', barOptions) : null;
+var bar = (progress) ? new ProgressBar('Progress [:bar] :percent :etas conc::concurrent :ips/s', barOptions) : null;
 var percentDone = 0;
 
-function updateBar(percentNow, concurrent) {
+function updateBar(percentNow, concurrent, ips) {
   if (!bar || percentNow <= percentDone) return; // if same or less return
   var inc = percentNow - percentDone;
-  var tokens = { concurrent: concurrent };
+  var tokens = { concurrent: concurrent, ips: ips };
   bar.tick(inc, tokens);
   percentDone = percentNow;
 }
 
 benchrest(flow, runOptions)
   .on('error', function (err, ctxName) { console.error('\nFailed in %s, err: ', ctxName, err); })
-  .on('progress', function (stats, percent, concurrent) { // only if progress enabled
-    updateBar(percent, concurrent);
+  .on('progress', function (stats, percent, concurrent, ips) { // only if progress enabled
+    updateBar(percent, concurrent, ips);
   })
   .on('end', function (stats, errorCount) {
     updateBar(100, 0);
