@@ -58,6 +58,9 @@ Simple flow performing 100 iterations with 10 concurrent connections
       { get: 'http://localhost:8000/foo_#{INDEX}' }
     ]
   };
+
+  module.exports = flow;
+
   // There are even more flow options like setup and teardown, see detailed usage
 
   var runOptions = {
@@ -201,6 +204,9 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
     afterMain: [{ del: 'http://localhost:8000/foo_#{INDEX}' }],   // operations to do after each iteration
     after: []        // operations to do after everything is done
   };
+
+  module.exports = flow;
+
   var runOptions = {
     limit: 10,         // concurrent connections
     iterations: 1000,  // number of iterations to perform
