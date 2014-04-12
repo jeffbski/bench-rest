@@ -59,6 +59,9 @@ Simple flow performing 100 iterations with 10 concurrent connections
     ]
   };
 
+  // if the above flow was in a separate file you export it
+  // and then require it where you want to use it with something like
+  // `var flow = require('./your-flow')`
   module.exports = flow;
 
   // There are even more flow options like setup and teardown, see detailed usage
@@ -162,6 +165,9 @@ file which exports a REST flow. For example:
     main: [{ get: 'http://localhost:8000/' }]  // could be an array of REST operations
   };
 
+  // if the above flow was in a separate file you export it
+  // and then require it where you want to use it with something like
+  // `var flow = require('./your-flow')`
   module.exports = flow;
 ```
 
