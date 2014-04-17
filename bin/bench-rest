@@ -138,7 +138,7 @@ benchrest(flow, runOptions)
     updateBar(percent, concurrent, ips);
   })
   .on('end', function (stats, errorCount) {
-    updateBar(100, 0, Math.round(stats.main.meter.mean));
+    updateBar(100, 0, (stats.main)? Math.round(stats.main.meter.mean) : 0);
     console.log('\n\nerrors: ', errorCount);
     console.log('stats: ', stats);
     process.exit(errorCount);
