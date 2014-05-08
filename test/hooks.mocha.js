@@ -97,9 +97,7 @@ test('using location header from post for get, store in env', function (done) {
         body: 'hello#{INDEX}',
         afterHooks: [
           function (all) {
-            // save this by index
-            if (!all.env.locationByIndex) all.env.locationByIndex = [];
-            all.env.locationByIndex[all.env.index] = all.response.headers.location;
+            all.env.location = all.response.headers.location;
             return all;
           }
         ]
@@ -108,7 +106,7 @@ test('using location header from post for get, store in env', function (done) {
         get: 'http://localhost:8000/LOCATION',
         beforeHooks: [
           function (all) {
-            var location = all.env.locationByIndex[all.env.index];
+            var location = all.env.location;
             all.requestOptions.uri = all.requestOptions.uri.replace('/LOCATION', location);
             return all;
           }
