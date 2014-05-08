@@ -379,9 +379,9 @@ The list of current built-in afterHooks:
  - `verify2XX` - afterHook which fails if an operation's status code was not in 200-299 range. If you don't want a redirect followed, be sure to add the request option `followRedirect: false`. Note: by default errors are verified (greater than or equal to 400), so this would just be used when you want to make sure it is not a 3xx either.
 
 
-To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted.
+To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted. Using these beforeHooks you can modify the next request, and using the afterHooks can verify the response and/or store data for future actions. The best way to keep the data separate is to use the all.env.index which will be a unique integer starting with 0 for the iteration. See `examples/hook.js` and `test/hooks.mocha.js`
 
-So a verification function could be written as such
+So a preprocess, postprocess, or verification function could be written as such
 
 ```javascript
 function verifyData(all) {
@@ -400,7 +400,11 @@ The properties available on the `all` object are:
  - all.env.password - basic auth password if provided
  - all.env.etags - object of etags saved by URI
  - all.opIndex - zero based index for the operation in the array of operations, ie: first operation in the main flow will have opIndex of 0
- - all.action.requestOptions - the options that will be used for the request
+ - all.requestOptions - the options that will be used for the request (see mikeal/request)
+ - all.requestOptions.uri - the URL that will be used for the request
+ - all.requestOptions.method - the method that will be used for the request
+ - all.response - the response obj (only for afterHooks)
+ - all.body - the response body (only for afterHooks)
  - all.err - not empty if an error has occurred
  - all.cb - the cb that will be called when done
 
