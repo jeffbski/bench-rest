@@ -44,7 +44,7 @@ test('simple get', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations);
       done();
     });
@@ -71,7 +71,7 @@ test('simple get with progress', function (done) {
       t.isNumber(concurrent, 'should have a concurrent connections count');
     })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations);
       t.ok(progressFired, 'progress event should have fired');
       done();
@@ -92,7 +92,7 @@ test('stats provides measured data with totalElapsed and main metrics', function
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.isNumber(stats.totalElapsed, 'should have total elapsed time in millisecs');
       t.equal(stats.main.meter.count, runOptions.iterations, 'should have count equal to the iterations completed');
       t.isNumber(stats.main.meter.mean, 'should have an average for iterations/sec');
@@ -124,7 +124,7 @@ test('simple put/get flow', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations * flow.main.length);
       t.deepEqual(requests[0], { method: 'PUT', url: '/foo', data: '"mydata"' });
       t.deepEqual(requests[1], { method: 'GET', url: '/foo', data: '' });
@@ -150,7 +150,7 @@ test('put/get flow with token substitution', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations * flow.main.length);
       t.deepEqual(requests[0], { method: 'PUT', url: '/foo_0', data: '"mydata_0"' });
       t.deepEqual(requests[1], { method: 'GET', url: '/foo_0', data: '' });
@@ -172,7 +172,7 @@ test('allow flow to be defined as single string URL implying GET', function (don
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations);
       done();
     });
@@ -189,7 +189,7 @@ test('allow flow to be defined as single operation', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations);
       done();
     });
@@ -206,7 +206,7 @@ test('allow flow to be defined as array of main operations', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       t.equal(requests.length, runOptions.iterations);
       done();
     });
@@ -235,7 +235,7 @@ test('put/get flow with before, beforeMain, afterMain, after', function (done) {
   benchrest(flow, runOptions)
     .on('error', function (err, ctxName) { errors.push(err); })
     .on('end', function (stats, errorCount) {
-      if (errorCount) done(errors[0] || 'unknown error');
+      if (errorCount) return done(errors[0] || 'unknown error');
       var totalRequests = runOptions.iterations *
         (flow.main.length + flow.beforeMain.length + flow.afterMain.length) +
         flow.before.length + flow.after.length;
