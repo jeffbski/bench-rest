@@ -389,8 +389,8 @@ So a verification function could be written as such
 function verifyData(all) {
   if (all.err) return all; // errored so just return and it will error as normal
   assert.equal(all.response.statusCode, 200);
-  assert(all.body, 'foobarbaz');
-  return all;
+  assert(all.body, 'foobarbaz'); // if throws, err is caught and counted
+  return all; // always return all if you want it to continue
 }
 ```
 
@@ -398,9 +398,10 @@ Postprocess function example:
 
 ```javascript
 function postProcess(all) {
+  // all.iterCtx obj is where you can keep data for an iteration
   all.iterCtx.location = all.response.headers.location;
   all.iterCtx.body = all.body;
-  return all;
+  return all; // always return all if you want it to continue
 }
 ```
 
@@ -408,9 +409,10 @@ Preprocess function example:
 
 ```javascript
 function preProcess(all) {
+  // all.iterCtx object is where you can keep data private for an iteration
   // all.requestOptions will be used for the request, modify as needed
   all.requestOptions.uri = 'http://localhost:8000' + all.iterCtx.location;
-  return all;
+  return all; // always return all if you want it to continue
 }
 ```
 
@@ -422,7 +424,7 @@ The properties available on the `all` object are:
  - all.env.user - basic auth user if provided
  - all.env.password - basic auth password if provided
  - all.env.etags - object of etags saved by URI
- - all.iterCtx - empty object created for each iteration, can be used for any user storage from beforeHooks and afterHooks
+ - all.iterCtx - empty object created for each iteration, can be used for your private storage from beforeHooks and afterHooks
  - all.opIndex - zero based index for the operation in the array of operations, ie: first operation in the main flow will have opIndex of 0
  - all.requestOptions - the options that will be used for the request (see mikeal/request)
  - all.requestOptions.uri - the URL that will be used for the request
