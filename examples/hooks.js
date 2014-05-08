@@ -25,8 +25,9 @@ var flow = {
       afterHooks: [
         function (all) {
           // save location
+          // all.iterCtx obj is where you can keep data for an iteration
           all.iterCtx.location = all.response.headers.location;
-          return all;
+          return all; // always return all if you want it to continue
         }
       ]
     },
@@ -37,14 +38,14 @@ var flow = {
           // use previously saved location in our URI
           var location = all.iterCtx.location;
           all.requestOptions.uri = all.requestOptions.uri.replace('/LOCATION', location);
-          return all;
+          return all; // always return all if you want it to continue
         }
       ],
       afterHooks: [
         // verify data from what we expected
         function (all) {
           assert.equal(all.body, 'hello'+all.env.index);
-          return all;
+          return all; // always return all if you want it to continue
         }
       ]
     }
