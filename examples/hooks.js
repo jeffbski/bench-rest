@@ -6,12 +6,11 @@ var assert = require('assert');
  * Example of a flow which uses an afterHook to store data
  * from an action, that will be used by a subsequent action.
  *
- * The data is being stored in all.env which is global to the
- * run. So an array or object can be created and data is
- * stored uniquely by using all.env.index
+ * The data is being stored in all.iterCtx which is available
+ * to each action in the iteration.
  *
  * A beforeHook can be used on a subsequent action to retrieve
- * the data by all.env.index and use it to modify any of the
+ * the data from all.iterCtx and use it to modify any of the
  * request parameters.
  */
 
@@ -25,9 +24,8 @@ var flow = {
       body: 'hello#{INDEX}',
       afterHooks: [
         function (all) {
-          // save location by index
-          if (!all.env.locationByIndex) all.env.locationByIndex = [];
-          all.env.locationByIndex[all.env.index] = all.response.headers.location;
+          // save location
+          all.iterCtx.location = all.response.headers.location;
           return all;
         }
       ]
@@ -37,7 +35,7 @@ var flow = {
       beforeHooks: [
         function (all) {
           // use previously saved location in our URI
-          var location = all.env.locationByIndex[all.env.index];
+          var location = all.iterCtx.location;
           all.requestOptions.uri = all.requestOptions.uri.replace('/LOCATION', location);
           return all;
         }

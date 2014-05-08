@@ -379,9 +379,11 @@ The list of current built-in afterHooks:
  - `verify2XX` - afterHook which fails if an operation's status code was not in 200-299 range. If you don't want a redirect followed, be sure to add the request option `followRedirect: false`. Note: by default errors are verified (greater than or equal to 400), so this would just be used when you want to make sure it is not a 3xx either.
 
 
-To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted. Using these beforeHooks you can modify the next request, and using the afterHooks can verify the response and/or store data for future actions. The best way to keep the data separate is to use the all.env.index which will be a unique integer starting with 0 for the iteration. See `examples/hook.js` and `test/hooks.mocha.js`
+To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted. Using these beforeHooks you can modify the next request, and using the afterHooks can verify the response and/or store data for future actions.
 
-So a preprocess, postprocess, or verification function could be written as such
+One way to keep state for each iteration (without using external variables) is to use the all.iterCtx object which is an empty object provided for each iteration. See `examples/hook.js` and `test/hooks-iter-ctx.mocha.js`
+
+So a verification function could be written as such
 
 ```javascript
 function verifyData(all) {
@@ -392,6 +394,27 @@ function verifyData(all) {
 }
 ```
 
+Postprocess function example:
+
+```javascript
+function postProcess(all) {
+  all.iterCtx.location = all.response.headers.location;
+  all.iterCtx.body = all.body;
+  return all;
+}
+```
+
+Preprocess function example:
+
+```javascript
+function preProcess(all) {
+  // all.requestOptions will be used for the request, modify as needed
+  all.requestOptions.uri = 'http://localhost:8000' + all.iterCtx.location;
+  return all;
+}
+```
+
+
 The properties available on the `all` object are:
 
  - all.env.index - the zero based counter for this iteration, same as what is used for #{INDEX}
@@ -399,6 +422,7 @@ The properties available on the `all` object are:
  - all.env.user - basic auth user if provided
  - all.env.password - basic auth password if provided
  - all.env.etags - object of etags saved by URI
+ - all.iterCtx - empty object created for each iteration, can be used for any user storage from beforeHooks and afterHooks
  - all.opIndex - zero based index for the operation in the array of operations, ie: first operation in the main flow will have opIndex of 0
  - all.requestOptions - the options that will be used for the request (see mikeal/request)
  - all.requestOptions.uri - the URL that will be used for the request
