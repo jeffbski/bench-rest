@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "accum": "~0.1.1",
+    "hapi": "~6.11.1",
     "mocha": "~1.21.4",
     "chai": "~1.9.2",
     "chai-stack": "~1.3.1"

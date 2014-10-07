@@ -249,9 +249,9 @@ The `stats.main` will be the meter data for the main benchmark flow operations (
 
 A couple key metrics to be aware of:
 
- - `stats.main.mean` - average iterations / sec
- - `stats.main.count` - iterations completed
- - `stats.main.currentRate` - iterations / sec at this moment (mainly useful when monitoring progress)
+ - `stats.main.meter.mean` - average iterations / sec
+ - `stats.main.meter.count` - iterations completed
+ - `stats.main.meter.currentRate` - iterations / sec at this moment (mainly useful when monitoring progress)
  - `stats.main.1MinuteRate` - iterations / sec for the last minute (only relevant if more than 1 minute has passed)
  - `stats.main.histogram.min` - the minimum time any iteration took (milliseconds)
  - `stats.main.histogram.max` - the maximum time any iteration took (milliseconds)
