@@ -31,7 +31,7 @@ Roughly `bench-rest` = [mikeal/request](https://github.com/mikeal/request) + [ca
 <a name="installation"/>
 ## Installation
 
-Requires node.js >= 0.8
+Requires node.js >= 0.10
 
 ```bash
 # If using programmatically
