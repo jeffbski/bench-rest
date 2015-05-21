@@ -100,6 +100,8 @@ Outputs
 
     -h, --help                   output usage information
     -V, --version                output the version number
+    -s --server [port]           Run as server on given port, defaults to 8080
+    -r --remote [host:port]      Run tests on given remote, defaults to http://127.0.0.1:8080
     -n --iterations <integer>    Number of iterations to run, defaults to 1
     -a --prealloc <integer>      Max iterations to preallocate, defaults 100000
     -c --concurrency <integer>   Concurrent operations, defaults to 10

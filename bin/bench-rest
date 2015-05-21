@@ -20,6 +20,9 @@ var VERSION = package.version;
 prog
   .version(VERSION)
   .usage('[options] <flow-js-path-or-GET-URL>')
+  .option('-s --server [port]', 'Run as server on given port, defaults to 8080')
+  .option('-r --remote [host:port]', 'Run tests on given remote, defaults to http://127.0.0.1:8080')
+  .option('-k --key <key>', 'Secret key for authenticating remote calls')
   .option('-n --iterations <integer>', 'Number of iterations to run, defaults to 1')
   .option('-a --prealloc <integer>', 'Max iterations to preallocate, defaults 100000')
   .option('-c --concurrency <integer>', 'Concurrent operations, defaults to 10')
@@ -62,13 +65,33 @@ if (prog.evaluate) { // evaluate option specified
     process.exit(2);
   }
 } else { // normal, not evaluate
-  if (prog.args.length !== 1) { // should only specify one file
+  if (!prog.server && prog.args.length !== 1) { // should only specify one file
     process.stdout.write(prog.helpInformation());
     prog.emit('--help');
     process.exit(3);
   }
 }
 
+if (prog.server) {
+  var server = 8080;
+  if (typeof prog.server === 'string') {
+    server = parseInt(prog.server, 10);
+    if (!server) {
+      console.error('Remote port needs to be numeric');
+      process.exit(1);
+    }
+  }
+}
+
+
+if (prog.remote) {
+  var host = 'http://127.0.0.1:8080';
+  if (typeof prog.remote === 'string') {
+    host = prog.remote;
+  }
+}
+
+var key = prog.key;
 var iterations = parseInt(prog.iterations || '1', 10);
 var prealloc = parseInt(prog.prealloc || '100000', 10)
 var concurrency = parseInt(prog.concurrency || '10', 10);
@@ -77,8 +100,13 @@ var user = prog.user;
 var password = prog.password;
 var progress = parseInt(prog.progress || 1000);
 
+if ((server || host) && ! key) {
+  console.error('You need to set a key when running in client/server mode.');
+  process.exit(1);
+}
+
 var flowFromMsg;
-if (!flow) {
+if (!flow && !server) {
   var flowJSPathOrGetURL  = prog.args.shift().trim();
   if (/^http/.test(flowJSPathOrGetURL)) flow = flowJSPathOrGetURL; // specify flow as just GET str
 
@@ -92,8 +120,6 @@ if (!flow) {
     flowFromMsg = 'Using flow from: ' + absPathFlowJS;
   }
 }
-
-
 
 var msg = 'Benchmarking ' + iterations + ' iteration(s) using up to ' +
   concurrency + ' concurrent connections';
@@ -114,7 +140,6 @@ var runOptions = {
   progress: progress
 };
 
-
 var barOptions = {
   complete: '=',
   incomplete: ' ',
@@ -125,28 +150,113 @@ var bar = (progress) ? new ProgressBar('Progress [:bar] :percent :etas conc::con
 var percentDone = 0;
 
 function updateBar(percentNow, concurrent, ips) {
-  if (!bar || percentNow <= percentDone) return; // if same or less return
+  if (!bar) return;
   var inc = percentNow - percentDone;
   var tokens = { concurrent: concurrent, ips: ips };
   bar.tick(inc, tokens);
   percentDone = percentNow;
 }
 
-benchrest(flow, runOptions)
-  .on('error', function (err, ctxName) { console.error('\nFailed in %s, err: ', ctxName, err); })
-  .on('progress', function (stats, percent, concurrent, ips) { // only if progress enabled
-    updateBar(percent, concurrent, ips);
-  })
-  .on('end', function (stats, errorCount) {
-    updateBar(100, 0, (stats.main) ? Math.round(stats.main.meter.mean) : 0);
-    console.log('\n\nerrors: ', errorCount);
-    console.log('stats: ', stats);
+function authenticate(data, cb) {
+  var authenticated = false;
+  if (data === key) authenticated = true;
+  cb(null, authenticated);
+}
+
+function benchrestError(err, ctxName) {
+  console.error('\nFailed in %s, err: ', ctxName, err);
+}
+
+function benchrestProgress(stats, percent, concurrent, ips) {
+  updateBar(percent, concurrent, ips);
+}
+
+function benchrestEnd(stats, errorCount) {
+  updateBar(100, 0, (stats.main) ? Math.round(stats.main.meter.mean) : 0);
+  console.log('\n\nerrors: ', errorCount);
+  console.log('stats: ', stats);
+  if (!server) {
     process.exit(errorCount);
+  }
+}
+
+function benchrestLocal(flow, runOptions) {
+  benchrest(flow, runOptions)
+  .on('error', benchrestError)
+  .on('progress', benchrestProgress)
+  .on('end', benchrestEnd);
+}
+
+function benchrestRemote(client, flow, runOptions) {
+  client.on('benchrest:error', function (data) {
+    error = true;
+    benchrestError(data.err, data.ctxName);
+  })
+  .on('benchrest:progress', function (data) {
+    benchrestProgress(data.stats, data.percent, data.concurrent, data.ips);
+  })
+  .on('benchrest:end', function (data) {
+    benchrestEnd(data.stats, data.errorCount);
+  })
+  .emit('benchrest:run', {flow: flow, runOptions: runOptions});
+}
+
+if (server) {
+  // Run in server mode
+  var io = require('socket.io')(server);
+  require('socketio-auth')(io, {
+    authenticate: authenticate,
+    timeout: 1000
   });
-
-
-
-
-
-
-
+  io.on('connection', function (client) {
+    console.log('=> Server: New connection');
+    client.on('benchrest:run', function (args) {
+      var flow = args.flow;
+      var runOptions = args.runOptions;
+      benchrest(flow, runOptions)
+      .on('error', function (err, ctxName) {
+        client.emit('benchrest:error', {
+          err: err,
+          ctxName: ctxName
+        });
+        // benchrestError.apply(this, arguments);
+      }).on('progress', function (stats, percent, concurrent, ips) {
+        client.emit('benchrest:progress', {
+          stats: stats,
+          percent: percent,
+          concurrent: concurrent,
+          ips: ips
+        });
+        // benchrestProgress.apply(this, arguments);
+      }).on('end', function (stats, errorCount) {
+        client.emit('benchrest:end', {
+          stats: stats,
+          errorCount: errorCount
+        });
+        // benchrestEnd.apply(this, arguments);
+      });
+    });
+  });
+} else if (host) {
+  // Run in remote mode
+  var error;
+  var client = require('socket.io-client')(host);
+  client.on('connect', function () {
+    console.log('=> Client: Connected');
+    client.emit('authentication', key);
+  });
+  client.on('disconnect', function () {
+    console.log('=> Client: Disconnected');
+    if (!error) {
+      console.log('Wrong key?');
+      process.exit(1);
+    }
+  });
+  client.on('authenticated', function () {
+    console.log('=> Client: Authenticated');
+    benchrestRemote(client, flow, runOptions);
+  });
+} else {
+  // Run in local mode
+  benchrestLocal(flow, runOptions);
+}
