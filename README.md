@@ -88,7 +88,7 @@ See <a href="#detailed-usage">Detailed Usage</a> section below for more details
 bench-rest
 
 # otherwise use from node_modules
-node_modules/bin/bench-rest
+node_modules/.bin/bench-rest
 ```
 
 Outputs
