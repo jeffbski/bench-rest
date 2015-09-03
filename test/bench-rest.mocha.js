@@ -351,4 +351,3 @@ test('null flow throws error', function () {
            'should throw when cannot find the main operations');
 
 });
-

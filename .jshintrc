@@ -4,7 +4,6 @@
   "predef": [
     "Arguments",
     "alert",
-    "chai",
     "console",
     "exports",
     "localStorage",
