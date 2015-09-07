@@ -339,6 +339,7 @@ Each operation can have the following properties:
  - alternatively can specify `method` (use uppercase) and `uri` directly, ex: `{ method: 'GET', uri: 'http://localhost:8000/foo' }`
  - `json` optionally provide data which will be JSON stringified and provided as body also setting content type to application/json, ex: `{ put: 'http://localhost:8000/foo', json: { foo: 10 } }`
  - `headers` - optional headers to set, ex: `{ get: 'http://localhost:8000/foo', headers: { 'Accept-Encoding': 'gzip'}`
+ - `delayAfter` - insert an forced delay after a request before proceeding in msecs. Note this will be included in overall timing.
  - any other properties/options which are valid for `mikeal/request` - see https://github.com/mikeal/request
  - pre/post processing - optional array as `beforeHooks` and `afterHooks` which can perform processing before and/or after an operation. See <a href="#pre-post">Pre/post operation processing</a> section below for details.
 
@@ -499,4 +500,3 @@ If you have input or ideas or would like to get involved, you may:
 ## License - MIT
 
  - [MIT license](http://github.com/jeffbski/bench-rest/raw/master/LICENSE)
-
