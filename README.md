@@ -185,7 +185,7 @@ See <a href="#detailed-usage">Detailed Usage</a> for more details on creating mo
  - Run programmatically so can be used with CI server
  - Flow can have setup and teardown operations for startup and shutdown as well as for each iteration
  - Ability to automatically handles cookies separately for each iteration
- - Abilty to automatically follows redirects for operations
+ - Ability to automatically follows redirects for operations
  - Errors will automatically stop an iterations flow and be tracked
  - Easy use and handling of etags
  - Allows pre/post processing or verification of data
