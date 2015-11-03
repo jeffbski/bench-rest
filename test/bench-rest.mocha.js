@@ -13,7 +13,7 @@ suite('bench-rest');
 before(function (done) {
   // Start an HTTP server
   httpServer = http.createServer(function (request, response) {
-    request.pipe(accum.string('utf8', function (str) { // accumululate any incoming data
+    request.pipe(accum.string({ encoding: 'utf8'}, function (str) { // accumululate any incoming data
       requests.push({ method: request.method, url: request.url, data: str }); // save these
     }));
     if (request.url === '/makeError') { // create an unauthorized 401 error for this URL only
@@ -23,7 +23,7 @@ before(function (done) {
       response.writeHead(200, {"Content-Type": "text/plain"});
       response.end("Hello World");
     }
-  }).listen(8000);
+  }).listen(8008);
   done();
 });
 
@@ -33,7 +33,7 @@ after(function (done) {
 
 test('simple get', function (done) {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     limit: 10,
@@ -52,7 +52,7 @@ test('simple get', function (done) {
 
 test('simple get with progress', function (done) {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     limit: 10,
@@ -81,7 +81,7 @@ test('simple get with progress', function (done) {
 
 test('stats provides measured data with totalElapsed and main metrics', function (done) {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     limit: 10,
@@ -111,8 +111,8 @@ test('stats provides measured data with totalElapsed and main metrics', function
 test('simple put/get flow', function (done) {
   var flow = {
     main: [
-      { put: 'http://localhost:8000/foo', json: 'mydata' },
-      { get: 'http://localhost:8000/foo' }
+      { put: 'http://localhost:8008/foo', json: 'mydata' },
+      { get: 'http://localhost:8008/foo' }
     ]
   };
   var runOptions = {
@@ -137,8 +137,8 @@ test('simple put/get flow', function (done) {
 test('put/get flow with token substitution', function (done) {
   var flow = {
     main: [
-      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
-      { get: 'http://localhost:8000/foo_#{INDEX}' }
+      { put: 'http://localhost:8008/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
+      { get: 'http://localhost:8008/foo_#{INDEX}' }
     ]
   };
   var runOptions = {
@@ -162,7 +162,7 @@ test('put/get flow with token substitution', function (done) {
 
 
 test('allow flow to be defined as single string URL implying GET', function (done) {
-  var flow = 'http://localhost:8000';
+  var flow = 'http://localhost:8008';
   var runOptions = {
     limit: 10,
     iterations: 100
@@ -179,7 +179,7 @@ test('allow flow to be defined as single string URL implying GET', function (don
 });
 
 test('allow flow to be defined as single operation', function (done) {
-  var flow = { get: 'http://localhost:8000' };
+  var flow = { get: 'http://localhost:8008' };
   var runOptions = {
     limit: 10,
     iterations: 100
@@ -196,7 +196,7 @@ test('allow flow to be defined as single operation', function (done) {
 });
 
 test('allow flow to be defined as array of main operations', function (done) {
-  var flow = [{ get: 'http://localhost:8000' }];
+  var flow = [{ get: 'http://localhost:8008' }];
   var runOptions = {
     limit: 10,
     iterations: 100
@@ -217,14 +217,14 @@ test('allow flow to be defined as array of main operations', function (done) {
 
 test('put/get flow with before, beforeMain, afterMain, after', function (done) {
   var flow = {
-    before: [{ head: 'http://localhost:8000/beforeEverything' }],
-    beforeMain: [{ head: 'http://localhost:8000/foo_#{INDEX}?beforeEachIteration' }],
+    before: [{ head: 'http://localhost:8008/beforeEverything' }],
+    beforeMain: [{ head: 'http://localhost:8008/foo_#{INDEX}?beforeEachIteration' }],
     main: [
-      { put: 'http://localhost:8000/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
-      { get: 'http://localhost:8000/foo_#{INDEX}' }
+      { put: 'http://localhost:8008/foo_#{INDEX}', json: 'mydata_#{INDEX}' },
+      { get: 'http://localhost:8008/foo_#{INDEX}' }
     ],
-    afterMain: [{ del: 'http://localhost:8000/foo_#{INDEX}?afterEachIteration' }],
-    after: [{ head: 'http://localhost:8000/afterEverything' }]
+    afterMain: [{ del: 'http://localhost:8008/foo_#{INDEX}?afterEachIteration' }],
+    after: [{ head: 'http://localhost:8008/afterEverything' }]
   };
   var runOptions = {
     limit: 1,   // limiting to single at a time so can guarantee order for test verification
@@ -257,8 +257,8 @@ test('put/get flow with before, beforeMain, afterMain, after', function (done) {
 test('errors should be emitted and errorCount should return total', function (done) {
   var flow = {
     main: [
-      { get: 'http://localhost:8000/foo' },
-      { put: 'http://localhost:8000/makeError', json: 'mydata' }
+      { get: 'http://localhost:8008/foo' },
+      { put: 'http://localhost:8008/makeError', json: 'mydata' }
     ]
   };
   var runOptions = {
@@ -282,7 +282,7 @@ test('errors should be emitted and errorCount should return total', function (do
 
 test('null runOptions throws error', function () {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = null;
   function runWhichThrows() {
@@ -294,7 +294,7 @@ test('null runOptions throws error', function () {
 
 test('missing iterations property throws error', function () {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     limit: 10,
@@ -309,7 +309,7 @@ test('missing iterations property throws error', function () {
 
 test('missing limit property throws error', function () {
   var flow = {
-    main: [{ get: 'http://localhost:8000' }]
+    main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     // limit: 10,
@@ -324,7 +324,7 @@ test('missing limit property throws error', function () {
 
 test('missing main flow throws error', function () {
   var flow = {
-    // main: [{ get: 'http://localhost:8000' }]
+    // main: [{ get: 'http://localhost:8008' }]
   };
   var runOptions = {
     limit: 10,

@@ -16,7 +16,7 @@ beforeEach(function (done) {
   storedData = [];
   // Start an HTTP server
   httpServer = http.createServer(function (request, response) {
-    request.pipe(accum.string('utf8', function (str) { // accumululate any incoming data
+    request.pipe(accum.string({ encoding: 'utf8' }, function (str) { // accumululate any incoming data
       requests.push({ method: request.method, url: request.url, data: str }); // save these
       if (request.method === 'POST') { // save the data
         var storedLen = storedData.push(str);
@@ -30,7 +30,7 @@ beforeEach(function (done) {
         response.end(storedData[idx]);
       }
     }));
-  }).listen(8000);
+  }).listen(8008);
   done();
 });
 
@@ -45,7 +45,7 @@ test('using location header from post for get', function (done) {
   var flow = {
     main: [
       {
-        post: 'http://localhost:8000',
+        post: 'http://localhost:8008',
         body: 'hello#{INDEX}',
         afterHooks: [
           function (all) {
@@ -56,7 +56,7 @@ test('using location header from post for get', function (done) {
         ]
       },
       {
-        get: 'http://localhost:8000/LOCATION',
+        get: 'http://localhost:8008/LOCATION',
         beforeHooks: [
           function (all) {
             var location = locationByIndex[all.env.index];
@@ -93,7 +93,7 @@ test('using location header from post for get, store in env', function (done) {
   var flow = {
     main: [
       {
-        post: 'http://localhost:8000',
+        post: 'http://localhost:8008',
         body: 'hello#{INDEX}',
         afterHooks: [
           function (all) {
@@ -103,7 +103,7 @@ test('using location header from post for get, store in env', function (done) {
         ]
       },
       {
-        get: 'http://localhost:8000/LOCATION',
+        get: 'http://localhost:8008/LOCATION',
         beforeHooks: [
           function (all) {
             var location = all.env.location;

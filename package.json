@@ -21,18 +21,18 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "async": "~0.9.0",
-    "request": "~2.45.0",
-    "measured": "~0.1.6",
-    "commander": "~2.3.0",
-    "progress2": "~0.1.1"
+    "async": "^1.5.0",
+    "commander": "^2.9.0",
+    "measured": "^1.0.2",
+    "progress2": "~0.1.1",
+    "request": "~2.65.0"
   },
   "devDependencies": {
-    "accum": "~0.1.1",
-    "hapi": "~6.11.1",
-    "mocha": "~1.21.4",
-    "chai": "~1.9.2",
-    "chai-stack": "~1.3.1"
+    "accum": "^0.3.6",
+    "chai": "^3.4.0",
+    "chai-stack": "~1.3.1",
+    "hapi": "^6.11.1",
+    "mocha": "^2.3.3"
   },
   "bin": "bin/bench-rest",
   "scripts": {
