@@ -377,6 +377,8 @@ The list of current built-in afterHooks:
  - `saveEtag` - afterHook which causes an etag to be saved into an object cache specific to this iteration. Stored by URI. If the etag was the result of a POST operation and a `Location` header was provided, then the URI at the `Location` will be used.
  - `ignoreStatus` - afterHookif an operation could possibly return an error code that you want to ignore and always continue anyway. Failing status codes are those that are greater than or equal to 400. Normal operation would be to terminate an iteration if there is a failure status code in any `before`, `beforeMain`, or `main` operation.
  - `verify2XX` - afterHook which fails if an operation's status code was not in 200-299 range. If you don't want a redirect followed, be sure to add the request option `followRedirect: false`. Note: by default errors are verified (greater than or equal to 400), so this would just be used when you want to make sure it is not a 3xx either.
+ - `startStepTimer` - used in beforeHooks to start a timer for this step named step_OPIDX where OPIDX is the zero based index of the step in the flow. Be sure to call `endStepTimer` in afterHooks to end it. Provides detailed stats for an individual step in a flow.
+ - `endStepTimer` - used in afterHooks to end a timer previously started with `startStepTimer` and included in the stats displayed at the end of the run.
 
 
 To create custom beforeHook or afterHook the synchronous function needs to accept an `all` object and return the same or possibly modified object. To exit the flow, an exception can be thrown which will be caught and emitted. Using these beforeHooks you can modify the next request, and using the afterHooks can verify the response and/or store data for future actions.
@@ -424,6 +426,7 @@ The properties available on the `all` object are:
  - all.env.user - basic auth user if provided
  - all.env.password - basic auth password if provided
  - all.env.etags - object of etags saved by URI
+ - all.env.stats - measured stats collection containing `totalElapsed` and `main`. If `startStepTimer` and `endStepTimer` hooks are added to individual steps then additional timers step_OPINDEX will be created for steps that have the hooks.
  - all.iterCtx - empty object created for each iteration, can be used for your private storage from beforeHooks and afterHooks
  - all.opIndex - zero based index for the operation in the array of operations, ie: first operation in the main flow will have opIndex of 0
  - all.requestOptions - the options that will be used for the request (see mikeal/request)
@@ -499,4 +502,3 @@ If you have input or ideas or would like to get involved, you may:
 ## License - MIT
 
  - [MIT license](http://github.com/jeffbski/bench-rest/raw/master/LICENSE)
-
