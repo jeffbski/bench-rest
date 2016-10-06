@@ -21,11 +21,11 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "async": "^1.5.0",
+    "async": "^2.0.1",
     "commander": "^2.9.0",
     "measured": "^1.0.2",
     "progress2": "~0.1.1",
-    "request": "~2.74.0"
+    "request": "^2.75.0"
   },
   "devDependencies": {
     "accum": "^0.3.6",
