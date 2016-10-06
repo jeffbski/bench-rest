@@ -5,6 +5,7 @@ Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API
 Roughly `bench-rest` = [mikeal/request](https://github.com/mikeal/request) + [caolan/async](https://github.com/caolan/async) + [felixge/node-measured](https://github.com/felixge/node-measured)
 
 [![Build Status](https://secure.travis-ci.org/jeffbski/bench-rest.png?branch=master)](http://travis-ci.org/jeffbski/bench-rest)
+[![Known Vulnerabilities](https://snyk.io/test/github/jeffbski/bench-rest/d1fca5a48c8b5d6583a637810da529a9886a4952/badge.svg)](https://snyk.io/test/github/jeffbski/bench-rest/d1fca5a48c8b5d6583a637810da529a9886a4952)
 
 ## Contents on this page
 
