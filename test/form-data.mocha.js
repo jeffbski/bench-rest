@@ -8,7 +8,8 @@ var t = chai.assert;
 
 suite('form-data');
 
-var server = Hapi.createServer(3000, '127.0.0.1');
+var server = new Hapi.Server();
+server.connection({ port: 3000, address: '127.0.0.1' });
 
 afterEach(function (done) {
   server.stop(done);
