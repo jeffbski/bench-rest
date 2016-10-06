@@ -10,12 +10,7 @@
   "bugs": {
     "url": "http://github.com/jeffbski/bench-rest/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/jeffbski/bench-rest/raw/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "main": "lib/bench-rest",
   "engines": {
     "node": ">=0.10"
