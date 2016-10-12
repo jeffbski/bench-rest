@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "async": "~0.9.0",
-    "request": "2.68.0",
+    "request": "2.74.0",
     "measured": "~0.1.6",
     "commander": "~2.3.0",
     "progress2": "~0.1.1"
