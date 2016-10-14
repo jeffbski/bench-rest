@@ -160,6 +160,31 @@ test('put/get flow with token substitution', function (done) {
     });
 });
 
+test('simple patch/get flow', function (done) {
+  var flow = {
+    main: [
+      { patch: 'http://localhost:8008/foo', json: 'mydata' },
+      { get: 'http://localhost:8008/foo' }
+    ]
+  };
+  var runOptions = {
+    limit: 1,   // limiting to single at a time so can guarantee order for test verification
+    iterations: 2
+  };
+  var errors = [];
+  requests.length = 0;
+  benchrest(flow, runOptions)
+    .on('error', function (err, ctxName) { errors.push(err); })
+    .on('end', function (stats, errorCount) {
+      if (errorCount) return done(errors[0] || 'unknown error');
+      t.equal(requests.length, runOptions.iterations * flow.main.length);
+      t.deepEqual(requests[0], { method: 'PATCH', url: '/foo', data: '"mydata"' });
+      t.deepEqual(requests[1], { method: 'GET', url: '/foo', data: '' });
+      t.deepEqual(requests[2], { method: 'PATCH', url: '/foo', data: '"mydata"' });
+      t.deepEqual(requests[3], { method: 'GET', url: '/foo', data: '' });
+      done();
+    });
+});
 
 test('allow flow to be defined as single string URL implying GET', function (done) {
   var flow = 'http://localhost:8008';
