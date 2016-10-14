@@ -487,9 +487,9 @@ ulimit -S -n 20000  # set soft max open files
 
 ## Tested on Node versions
 
- - 0.8
- - 0.10
- - 0.11
+ - 4
+ - 5
+ - 6
 
 ## Get involved
 
@@ -498,6 +498,22 @@ If you have input or ideas or would like to get involved, you may:
  - contact me via twitter @jeffbski  - <http://twitter.com/jeffbski>
  - open an issue on github to begin a discussion - <https://github.com/jeffbski/bench-rest/issues>
  - fork the repo and send a pull request (ideally with tests) - <https://github.com/jeffbski/bench-rest>
+
+## Developer Notes
+
+We use semver for this package so any breaking changes will update the major version number.
+
+```bash
+npm test # runs tests
+```
+
+### Versioning and publish
+
+```bash
+npm version patch # increment version and create git tag, or minor, major
+git push origin master --tags # upload changes and tags to github
+npm publish # publish latest version to npm
+```
 
 <a name="license"/>
 ## License - MIT
