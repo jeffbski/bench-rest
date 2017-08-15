@@ -30,6 +30,7 @@ Roughly `bench-rest` = [mikeal/request](https://github.com/mikeal/request) + [ca
 
 
 <a name="installation"/>
+
 ## Installation
 
 Requires node.js >= 0.10
@@ -43,6 +44,7 @@ npm install -g bench-rest
 ```
 
 <a name="prog-usage"/>
+
 ## Programmatic Usage
 
 Simple flow performing 100 iterations with 10 concurrent connections
@@ -82,6 +84,7 @@ See <a href="#detailed-usage">Detailed Usage</a> section below for more details
 
 
 <a name="cmd-usage"/>
+
 ## Command-line usage
 
 ```bash
@@ -177,6 +180,7 @@ See <a href="#detailed-usage">Detailed Usage</a> for more details on creating mo
 
 
 <a name="goals"/>
+
 ## Goals
 
  - Easy to create REST (HTTP/HTTPS) flows for benchmarking
@@ -193,6 +197,7 @@ See <a href="#detailed-usage">Detailed Usage</a> for more details on creating mo
  - Provide programmatically and via cmd line the dynamic concurrency count
 
 <a name="detailed-usage"/>
+
 ## Detailed Usage
 
 Advanced flow with setup/teardown and multiple steps to benchmark in each iteration
@@ -230,6 +235,7 @@ Advanced flow with setup/teardown and multiple steps to benchmark in each iterat
 ```
 
 <a name="returns"/>
+
 ### Returns EventEmitter
 
 The main function from `require('bench-rest')` will return a node.js EventEmitter instance when called with the `flow` and `runOptions`. This event emitter will emit the following events:
@@ -240,6 +246,7 @@ The main function from `require('bench-rest')` will return a node.js EventEmitte
 
 
 <a name="stats"/>
+
 #### Stats (metrics) and errorCount benchmark results
 
 The `stats` is a `measured` data object and the `errorCount` is an count of the errors encountered. Time is reported in milliseconds. See `measured` for complete description of all the properties. https://github.com/felixge/node-measured
@@ -289,6 +296,7 @@ stats {
 ```
 
 <a name="shortcuts"/>
+
 ### Shortcuts for expressing flow
 
 If you have very simple flow that does not need setup and teardown, then there are a few shortcuts for expressing the flow.
@@ -306,6 +314,7 @@ var flow = [
 ```
 
 <a name="run-options"/>
+
 ### Run options
 
 The runOptions object can have the following properties which govern the benchmark run:
@@ -318,6 +327,7 @@ The runOptions object can have the following properties which govern the benchma
  - `progress` - optional, if non-zero number is provided it enables the output of progress events each time this number of milliseconds has passed
 
 <a name="rest-flow"/>
+
 ### REST Operations in the flow
 
 The REST operations that need to be performed in either as part of the main flow or for setup and teardown are configured using the following flow properties.
@@ -345,6 +355,7 @@ Each operation can have the following properties:
 
 
 <a name="tokens"/>
+
 ### Token substitution for iteration operations
 
 To make REST flows that are independent of each other, one often wants unique URLs and unique data, so one way to make this easy is to include special tokens in the `uri`, `json`, or `data`.
@@ -356,6 +367,7 @@ Currently the token(s) replaced in the `uri`, `json`, or `body` are:
 Note: for the `json` property the `json` object is JSON.stringified, tokens substituted, then JSON.parsed back to an object so that tokens will be substituted anywhere in the structure. If subsitution is not needed (no `#{INDEX}` in the structure, then no copy (stringify/parse) will be performed.
 
 <a name="pre-post"/>
+
 ### Pre/post operation processing
 
 If an array of hooks is specified in an operation as `beforeHooks` and/or `afterHooks` then these synchronous operations will be done before/after the REST operation.
@@ -440,6 +452,7 @@ The properties available on the `all` object are:
 
 
 <a name="why"/>
+
 ## Why create this project?
 
 It is important to understand how well your architecture performs and with each change to the system how performance is impacted. The best way to know this is to benchmark your system with each major change.
@@ -456,11 +469,13 @@ After attempting to use the variety of load testing clients and modules for benc
 Building your own is certainly an option but it gets tedious to make all the necessary setup and error handling to achieve a simple flow and thus this project was born.
 
 <a name="tuning"/>
+
 ## Tuning OS
 
 Each OS may need some tweaking of the configuration to be able to generate or receive a large number of concurrent connections.
 
 <a name="tuning-mac"/>
+
 ### Mac OS X
 
 The Mac OS X can be tweaked using the following parameters. The configuration allowed about 8K concurrent connections for a single process.
@@ -477,6 +492,7 @@ ulimit -S -n 20000  # set soft max open files
 ```
 
 <a name="modules"/>
+
 ## Key modules leveraged
 
  - request - https://github.com/mikeal/request - for http/https operations with cookies, redirects
@@ -516,6 +532,7 @@ npm publish # publish latest version to npm
 ```
 
 <a name="license"/>
+
 ## License - MIT
 
  - [MIT license](http://github.com/jeffbski/bench-rest/raw/master/LICENSE)
