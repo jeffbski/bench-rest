@@ -1,3 +1,6 @@
+# Forked
+@jonahss is working on this fork. See: https://github.com/jeffbski/bench-rest/pull/29
+
 # bench-rest benchmark REST API's
 
 Node.js client module for easy load testing / benchmarking REST (HTTP/HTTPS) API's using a simple structure/DSL can create REST flows with setup and teardown and returns (measured) metrics.
