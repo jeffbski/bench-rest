@@ -20,7 +20,8 @@
     "commander": "^2.9.0",
     "measured": "^1.0.2",
     "progress2": "~0.1.1",
-    "request": "^2.75.0"
+    "request": "^2.75.0",
+    "snyk": "^1.319.1"
   },
   "devDependencies": {
     "accum": "^0.3.6",
@@ -31,7 +32,9 @@
   },
   "bin": "bin/bench-rest",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha ./test/*.mocha.js"
+    "test": "./node_modules/mocha/bin/mocha ./test/*.mocha.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "keywords": [
     "benchmarking",
@@ -47,5 +50,6 @@
     "load testing",
     "client",
     "DSL"
-  ]
+  ],
+  "snyk": true
 }
