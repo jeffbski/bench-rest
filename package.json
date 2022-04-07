@@ -16,7 +16,7 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "async": "^2.0.1",
+    "async": "^3.2.2",
     "commander": "^2.9.0",
     "measured": "^1.0.2",
     "progress2": "~0.1.1",
